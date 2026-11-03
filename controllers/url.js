@@ -92,7 +92,8 @@ async function handleGenerateQRCode(req, res) {
             return res.status(404).send("Short URL not found");
         }
 
-        const shortURL = `${req.protocol}://${req.get("host")}/${url.shortId}`;
+        const baseURL = process.env.BASE_URL || `${req.protocol}://${req.get("host")}`;
+        const shortURL = `${baseURL.replace(/\/$/, "")}/${url.shortId}`;
 
         const qrCode = await QRCode.toDataURL(shortURL);
 
