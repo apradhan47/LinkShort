@@ -61,7 +61,7 @@
         <img src="<%= qrCode %>" alt="Short URL QR Code">
 
         <p class="url">
-            <%= `${typeof host !== 'undefined' ? host : 'http://localhost:8001'}/${url.shortId}` %>
+            <%= `${(typeof baseURL !== 'undefined' ? baseURL : 'http://localhost:8001').replace(/\/$/, '')}/${url.shortId}` %>
         </p>
 
         <a href="<%= qrCode %>" download="LinkShort-QR.png">

@@ -99,7 +99,8 @@ async function handleGenerateQRCode(req, res) {
 
         return res.render("qrcode", {
             qrCode,
-            url
+            url,
+            baseURL
         });
 
     } catch (error) {
