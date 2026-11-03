@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express=require("express");
 const path = require('path')
 const{connectToMongoDB}=require("./connect")
@@ -12,8 +13,9 @@ const app = express();
 
 const PORT=8001;
 
-connectToMongoDB("mongodb://localhost:27017/short-url")
-.then(()=>console.log("MongoDB connected!"))
+connectToMongoDB(process.env.MONGODB_URI)
+    .then(() => console.log("MongoDB Atlas connected!"))
+    .catch((err) => console.error("MongoDB connection error:", err));
 
 app.set("view engine","ejs");
 app.set('views',path.resolve("./views")); 
@@ -42,5 +44,18 @@ app.get("/:shortId",async(req,res)=>{
 
 
 
-app.listen(PORT,()=>console.log(`Server started a PORT:${PORT}`))
+const PORT = process.env.PORT || 8001;
+
+connectToMongoDB(process.env.MONGODB_URI)
+    .then(() => {
+        console.log("MongoDB Atlas connected!");
+
+        app.listen(PORT, () => {
+            console.log(`Server started at PORT: ${PORT}`);
+        });
+    })
+    .catch((err) => {
+        console.error("MongoDB connection failed:", err);
+        process.exit(1);
+    });
 
