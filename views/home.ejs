@@ -1,0 +1,365 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>LinkShort - URL Shortener</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f6fb;
+            color: #1e293b;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #64748b;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        input {
+            flex: 1;
+            padding: 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 15px;
+            min-width: 0;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            padding: 13px 20px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .error {
+            color: #dc2626;
+            margin-top: 15px;
+        }
+
+        .success {
+            background: #eff6ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            overflow-wrap: anywhere;
+        }
+
+        .success a {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        td {
+            font-size: 14px;
+        }
+
+        .short-link {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            padding: 8px 12px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+        .click-count {
+            background: #eff6ff;
+            color: #2563eb;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .empty {
+            text-align: center;
+            color: #94a3b8;
+            padding: 30px;
+        }
+
+        @media(max-width: 600px) {
+            body {
+                padding: 20px 12px;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>LinkShort</h1>
+        <p>Shorten your URLs. Track your clicks. Keep everything organized.</p>
+    </div>
+
+    <div class="card">
+
+        <h2>Create a Short URL</h2>
+
+        <form method="POST" action="/url">
+
+            <div class="input-group">
+
+                <input
+                    type="url"
+                    name="url"
+                    placeholder="https://example.com"
+                    required
+                >
+
+                <input
+                    type = "text"
+                    name = "customId"
+                    placeholder="Custom name (optional)"
+                >
+
+                <button type="submit">
+                    Generate Short URL
+                </button>
+
+            </div>
+
+        </form>
+
+        <% if (locals.error) { %>
+            <p class="error"><%= error %></p>
+        <% } %>
+
+        <% if (locals.id) { %>
+
+            <div class="success">
+
+                <strong>Your shortened URL:</strong><br><br>
+
+                <a href="/<%= id %>" target="_blank">
+                    <%= `${typeof host !== 'undefined' ? host : 'http://localhost:8001'}/${id}` %>
+                </a>
+
+                <button
+                    class="copy-btn"
+                    onclick="copyURL('<%= id %>')">
+                    Copy
+                </button>
+
+            </div>
+
+        <% } %>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Your URL History</h2>
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Short URL</th>
+                        <th>Original URL</th>
+                        <th>Total Clicks</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <% if (urls && urls.length > 0) { %>
+
+                        <% urls.forEach((url, index) => { %>
+
+                            <tr>
+
+                                <td><%= index + 1 %></td>
+
+                                <td>
+                                    <a
+                                        class="short-link"
+                                        href="/<%= url.shortId %>"
+                                        target="_blank">
+                                        <%= url.shortId %>
+                                    </a>
+                                </td>
+
+                                <td>
+                                    <%= url.redirectURL %>
+                                </td>
+
+                                <td>
+                                    <span class="click-count">
+                                        <%= url.visitHistory.length %>
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <button
+                                        class="copy-btn"
+                                        onclick="copyURL('<%= url.shortId %>')">
+                                        Copy
+                                    </button>
+
+                                    <a
+                                       href="/url/analytics/<%= url.shortId %>"
+                                       style="margin-left: 8px; color: #2563eb; text-decoration: none;">
+                                       Analytics
+                                    </a>
+
+                                    <form 
+                                        method="POST"
+                                        action="/url/delete/<%= url.shortId %>"
+                                        style="display: inline;"
+                                        onsubmit="return confirm('Are you sure you want to delete this URL?');"
+                                    >
+                                        <button
+                                            type = "submit"
+                                            style = "
+                                                 margin-left :8 px;
+                                                 padding: 8px 12px;
+                                                 font-size: 12px;
+                                                 background: #dc2626;
+                                                "
+                                            >
+                                               Delete
+                                        
+                                        </button>
+                                    
+                                    </form>
+
+
+
+                                </td>
+
+                            </tr>
+
+                        <% }) %>
+
+                    <% } else { %>
+
+                        <tr>
+                            <td colspan="5" class="empty">
+                                No URLs generated yet.
+                            </td>
+                        </tr>
+
+                    <% } %>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    async function copyURL(shortId) {
+
+        const shortURL = `${window.location.origin}/${shortId}`;
+
+        try {
+            await navigator.clipboard.writeText(shortURL);
+            alert("Short URL copied successfully!");
+        } catch (error) {
+            alert("Unable to copy URL. Please copy it manually: " + shortURL);
+        }
+
+    }
+
+</script>
+
+</body>
+</html>
