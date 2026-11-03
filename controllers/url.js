@@ -1,4 +1,4 @@
-
+const QRCode = require("qrcode");
 const shortid = require("shortid");
 const URL = require("../models/url");
 
@@ -82,9 +82,34 @@ async function handleDeleteURL(req, res) {
     return res.redirect("/");
 }
 
+async function handleGenerateQRCode(req, res) {
+    try {
+        const shortId = req.params.shortId;
+
+        const url = await URL.findOne({ shortId });
+
+        if (!url) {
+            return res.status(404).send("Short URL not found");
+        }
+
+        const shortURL = `${req.protocol}://${req.get("host")}/${url.shortId}`;
+
+        const qrCode = await QRCode.toDataURL(shortURL);
+
+        return res.render("qrcode", {
+            qrCode,
+            url
+        });
+
+    } catch (error) {
+        console.error("QR Code generation error:", error);
+        return res.status(500).send("Unable to generate QR code");
+    }
+}
 
 module.exports = {
     handleGenerateNewShortURL,
     handleGetAnalytics,
     handleDeleteURL,
+    handleGenerateQRCode,
 };
