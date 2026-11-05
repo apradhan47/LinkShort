@@ -5,7 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>LinkShort - URL Shortener</title>
+    <title>LinkShort | Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         * {
@@ -14,91 +18,297 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text: #172033;
+            --muted: #64748b;
+            --border: #e8edf4;
+        }
+
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f4f6fb;
-            color: #1e293b;
-            padding: 40px 20px;
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text);
         }
 
-        .container {
-            max-width: 1000px;
-            margin: auto;
+        .layout {
+            display: flex;
+            min-height: 100vh;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 35px;
-        }
+        /* Sidebar */
 
-        .header h1 {
-            font-size: 32px;
-            color: #2563eb;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            color: #64748b;
-        }
-
-        .card {
+        .sidebar {
+            width: 245px;
             background: white;
-            padding: 30px;
-            border-radius: 14px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border-right: 1px solid var(--border);
+            padding: 28px 18px;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            font-size: 25px;
+            font-weight: 800;
+            color: var(--primary);
+            padding: 0 12px;
+            margin-bottom: 45px;
+        }
+
+        .nav-label {
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 0 12px;
+            margin-bottom: 12px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 12px;
+            margin-bottom: 7px;
+            color: var(--muted);
+            text-decoration: none;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .nav-link.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .nav-link:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        /* Main content */
+
+        .main {
+            flex: 1;
+            min-width: 0;
+            padding: 38px 45px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 35px;
+            gap: 15px;
+        }
+
+        .topbar h1 {
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .topbar p {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 7px;
+        }
+
+        .profile {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 15px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Statistics */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            padding: 23px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.05);
+        }
+
+        .stat-card p {
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 14px;
+        }
+
+        .stat-card h2 {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .stat-icon {
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 8px 11px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 13px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* Panels */
+
+        .panel {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            padding: 25px;
             margin-bottom: 25px;
         }
 
-        .card h2 {
-            margin-bottom: 20px;
-            font-size: 20px;
+        .panel-heading {
+            margin-bottom: 22px;
         }
 
-        .input-group {
-            display: flex;
+        .panel-heading h2 {
+            font-size: 17px;
+            margin-bottom: 6px;
+        }
+
+        .panel-heading p {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        /* URL form */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 0.7fr auto;
             gap: 12px;
         }
 
         input {
-            flex: 1;
-            padding: 14px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 15px;
+            width: 100%;
             min-width: 0;
+            padding: 13px 14px;
+            border: 1px solid #dbe2ea;
+            border-radius: 8px;
+            outline: none;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px #2563eb15;
         }
 
         button {
             border: none;
-            border-radius: 8px;
-            padding: 13px 20px;
-            background: #2563eb;
-            color: white;
             cursor: pointer;
+            font-family: inherit;
             font-weight: 600;
         }
 
-        button:hover {
-            background: #1d4ed8;
+        .primary-btn {
+            background: var(--primary);
+            color: white;
+            border-radius: 8px;
+            padding: 13px 19px;
+            font-size: 13px;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+
+        .primary-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        /* Success and error messages */
+
+        .success {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 16px;
+            border-radius: 9px;
+            margin-top: 18px;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        .success a {
+            color: var(--primary);
+            font-weight: 600;
         }
 
         .error {
             color: #dc2626;
             margin-top: 15px;
+            font-size: 13px;
         }
 
-        .success {
-            background: #eff6ff;
-            padding: 15px;
+        /* Search toolbar */
+
+        .table-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .sort-select {
+            padding: 11px 13px;
+            border: 1px solid #dbe2ea;
             border-radius: 8px;
-            margin-top: 20px;
-            overflow-wrap: anywhere;
+            background: white;
+            color: #334155;
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            outline: none;
+        }
+        .sort-select:focus {
+            border-color: var(--primary);
         }
 
-        .success a {
-            color: #2563eb;
-            font-weight: 600;
+
+        .search-input {
+            max-width: 350px;
+            background: #f8fafc;
         }
+
+        .search-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .search-count {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        /* URL table */
 
         .table-wrapper {
             overflow-x: auto;
@@ -107,63 +317,213 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 650px;
-        }
-
-        th, td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
+            min-width: 750px;
         }
 
         th {
-            background: #f8fafc;
-            color: #64748b;
-            font-size: 13px;
+            text-align: left;
+            padding: 14px 12px;
+            font-size: 11px;
+            color: #94a3b8;
             text-transform: uppercase;
+            letter-spacing: 0.6px;
+            background: #f8fafc;
         }
 
         td {
-            font-size: 14px;
+            padding: 17px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        tbody tr:hover td {
+            background: #f8fbff;
+            transition: background 0.2s ease;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
         }
 
         .short-link {
-            color: #2563eb;
-            text-decoration: none;
+            color: var(--primary);
             font-weight: 600;
+            text-decoration: none;
         }
 
-        .copy-btn {
-            padding: 8px 12px;
-            font-size: 12px;
-            margin-left: 5px;
+        .short-link:hover {
+            text-decoration: underline;
+        }
+
+        .original-link {
+            display: block;
+            max-width: 230px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--muted);
         }
 
         .click-count {
-            background: #eff6ff;
-            color: #2563eb;
-            padding: 6px 12px;
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary);
             border-radius: 20px;
+            padding: 6px 12px;
             font-weight: 600;
+        }
+
+        /* Actions */
+
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .action-link:hover {
+            text-decoration: underline;
+        }
+
+        .copy-btn {
+            color: var(--primary);
+            background: var(--primary-light);
+            border-radius: 6px;
+            padding: 7px 10px;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #dbeafe;
+        }
+
+        .delete-btn {
+            color: #dc2626;
+            background: #fef2f2;
+            border-radius: 6px;
+            padding: 7px 10px;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: #fee2e2;
         }
 
         .empty {
             text-align: center;
             color: #94a3b8;
-            padding: 30px;
+            padding: 35px;
         }
 
-        @media(max-width: 600px) {
-            body {
-                padding: 20px 12px;
+        .table-footer {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 16px;
+        }
+
+        /* Responsive */
+
+        @media(max-width: 1000px) {
+            .main {
+                padding: 30px 22px;
             }
 
-            .input-group {
+            .sidebar {
+                width: 190px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .form-grid button {
+                grid-column: span 2;
+            }
+        }
+
+        @media(max-width: 650px) {
+            .layout {
+                display: block;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 15px;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+             .toolbar-right {
                 flex-direction: column;
+                align-items: stretch;
             }
 
-            .card {
-                padding: 20px;
+            .brand {
+                margin-bottom: 15px;
+                padding: 0 5px;
+            }
+
+            .nav-label {
+                display: none;
+            }
+
+            .nav-link {
+                display: inline-block;
+                margin: 0 3px 0 0;
+                padding: 9px;
+                font-size: 12px;
+            }
+
+            .main {
+                padding: 25px 15px;
+            }
+
+            .topbar h1 {
+                font-size: 21px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 17px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid button {
+                grid-column: auto;
+            }
+
+            .panel {
+                padding: 18px;
+            }
+
+            .profile {
+                display: none;
+            }
+
+            .table-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-input {
+                max-width: 100%;
             }
         }
     </style>
@@ -171,199 +531,413 @@
 
 <body>
 
-<div class="container">
+<div class="layout">
 
-    <div class="header">
-        <h1>LinkShort</h1>
-        <p>Shorten your URLs. Track your clicks. Keep everything organized.</p>
-    </div>
+    <!-- Sidebar -->
 
-    <div class="card">
+    <aside class="sidebar">
 
-        <h2>Create a Short URL</h2>
+        <div class="brand">LinkShort.</div>
 
-        <form method="POST" action="/url">
+        <div class="nav-label">WORKSPACE</div>
 
-            <div class="input-group">
+        <a href="/" class="nav-link active">▦ &nbsp; Overview</a>
+        <a href="#url-history" class="nav-link">↗ &nbsp; My Links</a>
 
-                <input
-                    type="url"
-                    name="url"
-                    placeholder="https://example.com"
-                    required
-                >
+        <div class="nav-label" style="margin-top: 30px;">
+            MANAGEMENT
+        </div>
 
-                <input
-                    type = "text"
-                    name = "customId"
-                    placeholder="Custom name (optional)"
-                >
+        <a href="#url-history" class="nav-link">◷ &nbsp; Analytics</a>
+        <a href="#url-history" class="nav-link">▧ &nbsp; QR Codes</a>
 
-                <button type="submit">
-                    Generate Short URL
-                </button>
+    </aside>
 
+
+    <!-- Main dashboard -->
+
+    <main class="main">
+
+        <div class="topbar">
+
+            <div>
+                <h1>Dashboard Overview</h1>
+                <p>Manage your links and track their performance.</p>
             </div>
 
-        </form>
-
-        <% if (locals.error) { %>
-            <p class="error"><%= error %></p>
-        <% } %>
-
-        <% if (locals.id) { %>
-
-            <div class="success">
-
-                <strong>Your shortened URL:</strong><br><br>
-
-                <a href="/<%= id %>" target="_blank">
-                    <%= `${typeof host !== 'undefined' ? host : 'http://localhost:8001'}/${id}` %>
-                </a>
-
-                <button
-                    class="copy-btn"
-                    onclick="copyURL('<%= id %>')">
-                    Copy
-                </button>
-
+            <div class="profile">
+                LinkShort Workspace
             </div>
-
-        <% } %>
-
-    </div>
-
-
-    <div class="card">
-
-        <h2>Your URL History</h2>
-
-        <div class="table-wrapper">
-
-            <table>
-
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Short URL</th>
-                        <th>Original URL</th>
-                        <th>Total Clicks</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    <% if (urls && urls.length > 0) { %>
-
-                        <% urls.forEach((url, index) => { %>
-
-                            <tr>
-
-                                <td><%= index + 1 %></td>
-
-                                <td>
-                                    <a
-                                        class="short-link"
-                                        href="/<%= url.shortId %>"
-                                        target="_blank">
-                                        <%= url.shortId %>
-                                    </a>
-                                </td>
-
-                                <td>
-                                    <%= url.redirectURL %>
-                                </td>
-
-                                <td>
-                                    <span class="click-count">
-                                        <%= url.visitHistory.length %>
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <button
-                                        class="copy-btn"
-                                        onclick="copyURL('<%= url.shortId %>')">
-                                        Copy
-                                    </button>
-
-                                    <a
-                                       href="/url/analytics/<%= url.shortId %>"
-                                       style="margin-left: 8px; color: #2563eb; text-decoration: none;">
-                                       Analytics
-                                    </a>
-
-                                    <a href="/url/qrcode/<%= url.shortId %>"
-                                       style="margin-left: 8px; color: #2563eb; text-decoration: none;">
-                                       QR Code
-                                    </a>
-                                    
-
-                                    <form 
-                                        method="POST"
-                                        action="/url/delete/<%= url.shortId %>"
-                                        style="display: inline;"
-                                        onsubmit="return confirm('Are you sure you want to delete this URL?');"
-                                    >
-                                        <button
-                                            type = "submit"
-                                            style = "
-                                                 margin-left :8 px;
-                                                 padding: 8px 12px;
-                                                 font-size: 12px;
-                                                 background: #dc2626;
-                                                "
-                                            >
-                                               Delete
-                                        
-                                        </button>
-                                    
-                                    </form>
-
-
-
-                                </td>
-
-                            </tr>
-
-                        <% }) %>
-
-                    <% } else { %>
-
-                        <tr>
-                            <td colspan="5" class="empty">
-                                No URLs generated yet.
-                            </td>
-                        </tr>
-
-                    <% } %>
-
-                </tbody>
-
-            </table>
 
         </div>
 
-    </div>
+
+        <!-- Statistics -->
+
+        <section class="stats">
+
+            <div class="stat-card">
+                <div class="stat-icon">LINKS</div>
+                <p>Total Short Links</p>
+                <h2><%= urls ? urls.length : 0 %></h2>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">CLICKS</div>
+                <p>Total Clicks</p>
+                <h2><%= urls ? urls.reduce((total, url) => total + url.visitHistory.length, 0) : 0 %></h2>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">AVG</div>
+                <p>Average Clicks per Link</p>
+                <h2><%= urls && urls.length ? (urls.reduce((total, url) => total + url.visitHistory.length, 0) / urls.length).toFixed(1) : 0 %></h2>
+            </div>
+
+        </section>
+
+
+        <!-- Create URL -->
+
+        <section class="panel">
+
+            <div class="panel-heading">
+                <h2>Create a new short link</h2>
+                <p>Paste your long URL and create a shareable short link.</p>
+            </div>
+
+            <form method="POST" action="/url">
+
+                <div class="form-grid">
+
+                    <input
+                        type="url"
+                        name="url"
+                        placeholder="https://example.com"
+                        required
+                    >
+
+                    <input
+                        type="text"
+                        name="customId"
+                        placeholder="Custom alias (optional)"
+                    >
+
+                    <button type="submit" class="primary-btn">
+                        + Generate Link
+                    </button>
+
+                </div>
+
+            </form>
+
+
+            <% if (locals.error) { %>
+                <p class="error"><%= error %></p>
+            <% } %>
+
+
+            <% if (locals.id) { %>
+
+                <div class="success">
+
+                    <strong>Your shortened URL:</strong><br><br>
+
+                    <a href="/<%= id %>" target="_blank">
+                        <%= `${typeof host !== 'undefined' ? host : 'http://localhost:8001'}/${id}` %>
+                    </a>
+
+                    <button
+                        type="button"
+                        class="copy-btn"
+                        onclick="copyURL('<%= id %>')">
+                        Copy
+                    </button>
+
+                </div>
+
+            <% } %>
+
+        </section>
+
+
+        <!-- URL History -->
+
+        <section class="panel" id="url-history">
+
+            <div class="panel-heading">
+                <h2>Your Links</h2>
+                <p>View and manage all your shortened URLs.</p>
+            </div>
+
+            <!-- Search -->
+
+            <div class="table-toolbar">
+
+                <input
+                    type="text"
+                    id="searchLinks"
+                    class="search-input"
+                    placeholder="Search by short URL or destination..."
+                    aria-label="Search shortened URLs"
+                >
+
+                <div class="toolbar-right">
+                    <select id="sortLinks" class="sort-select">
+                        <option value="recent">Recently Created</option>
+                        <option value="most">Most Clicked</option>
+                        <option value="least">Least Clicked</option>
+                         <option value="alphabetical">Alphabetical (A-Z)</option>
+                    </select>
+                    <span class="search-count" id="searchCount">
+                        Showing <%= urls ? urls.length : 0 %> links
+                    </span>
+                </div>
+
+            </div>
+
+
+            <!-- Table -->
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Short Link</th>
+                            <th>Destination</th>
+                            <th>Total Clicks</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="urlTableBody">
+
+                        <% if (urls && urls.length > 0) { %>
+
+                            <% urls.forEach((url, index) => { %>
+
+                                <tr class="url-row" data-created-at="<%= url.createdAt ? new Date(url.createdAt).getTime() : 0 %>">
+
+                                    <td><%= index + 1 %></td>
+
+                                    <td>
+                                        <a
+                                            class="short-link"
+                                            href="/<%= url.shortId %>"
+                                            target="_blank">
+                                            <%= url.shortId %>
+                                        </a>
+                                    </td>
+
+                                    <td>
+                                        <span
+                                            class="original-link"
+                                            title="<%= url.redirectURL %>">
+                                            <%= url.redirectURL %>
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="click-count">
+                                            <%= url.visitHistory.length %>
+                                        </span>
+                                    </td>
+
+                                    <td>
+
+                                        <div class="actions">
+
+                                            <button
+                                                type="button"
+                                                class="copy-btn"
+                                                onclick="copyURL('<%= url.shortId %>')">
+                                                Copy
+                                            </button>
+
+                                            <a
+                                                class="action-link"
+                                                href="/url/analytics/<%= url.shortId %>">
+                                                Analytics
+                                            </a>
+
+                                            <a
+                                                class="action-link"
+                                                href="/url/qrcode/<%= url.shortId %>">
+                                                QR Code
+                                            </a>
+
+                                            <form
+                                                method="POST"
+                                                action="/url/delete/<%= url.shortId %>"
+                                                onsubmit="return confirm('Are you sure you want to delete this URL?');">
+
+                                                <button
+                                                    type="submit"
+                                                    class="delete-btn">
+                                                    Delete
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            <% }) %>
+
+                        <% } else { %>
+
+                            <tr>
+                                <td colspan="5" class="empty">
+                                    No URLs generated yet. Create your first short link above!
+                                </td>
+                            </tr>
+
+                        <% } %>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="table-footer" id="tableFooter">
+                Showing <%= urls ? urls.length : 0 %> shortened links
+            </div>
+
+            <p class="empty" id="noSearchResults" style="display: none;">
+                No matching URLs found.
+            </p>
+
+        </section>
+
+    </main>
 
 </div>
 
 
 <script>
 
+    // Copy shortened URL
+
     async function copyURL(shortId) {
 
         const shortURL = `${window.location.origin}/${shortId}`;
 
         try {
+
             await navigator.clipboard.writeText(shortURL);
             alert("Short URL copied successfully!");
+
         } catch (error) {
+
             alert("Unable to copy URL. Please copy it manually: " + shortURL);
+
         }
 
     }
+
+
+    // Search URLs
+
+// Search and Sort URLs
+
+const searchInput = document.getElementById("searchLinks");
+const sortSelect = document.getElementById("sortLinks");
+const tableBody = document.getElementById("urlTableBody");
+
+const originalRows = Array.from(
+    document.querySelectorAll(".url-row")
+);
+
+// Store original order for recently created sorting
+const originalOrder = new Map(
+    originalRows.map((row, index) => [row, index])
+);
+
+function updateLinks() {
+
+    const searchValue = searchInput.value.toLowerCase().trim();
+    const sortValue = sortSelect.value;
+
+    const rows = Array.from(originalRows);
+
+    // Sorting
+    rows.sort((a, b) => {
+
+        const aClicks = Number(
+            a.querySelector(".click-count").textContent.trim()
+        );
+
+        const bClicks = Number(
+            b.querySelector(".click-count").textContent.trim()
+        );
+
+        const aName = a.querySelector(".short-link")
+            .textContent.trim().toLowerCase();
+
+        const bName = b.querySelector(".short-link")
+            .textContent.trim().toLowerCase();
+
+        switch (sortValue) {
+
+            case "most":
+                return bClicks - aClicks;
+
+            case "least":
+                return aClicks - bClicks;
+
+            case "alphabetical":
+                return aName.localeCompare(bName);
+
+            case "recent":
+            default:
+                return Number(b.dataset.createdAt) - Number(a.dataset.createdAt);
+
+        }
+
+    });
+
+    // Reorder rows in the table
+    rows.forEach(row => tableBody.appendChild(row));
+
+    // Search and display matching rows
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+
+        const rowText = row.innerText.toLowerCase();
+
+        const matches = rowText.includes(searchValue);
+
+        row.style.display = matches ? "" : "none";
+
+        if (matches) {
+            visibleCount++;
+        }
+
+    });
+
+    // Update result count
+    document.getElementById("searchCount").textContent =
+        `Showing ${visibleCount} of ${rows.length} links`;
+
+    document.getElementById("tableFooter").textContent =
+        `Showing ${visibleCount} shortened links`;
+
+    document.getElementById("noSearchResults").style.display =
+        visibleCount === 0 && rows.length > 0 ? "block" : "none";
+
+}
+
+// Listen for search and sorting changes
+searchInput.addEventListener("input", updateLinks);
+sortSelect.addEventListener("change", updateLinks);
 
 </script>
 
