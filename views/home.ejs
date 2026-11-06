@@ -406,6 +406,19 @@
             background: #dbeafe;
         }
 
+        .edit-btn {
+            color:#2563eb;
+            background: #eff6ff;
+            border-radius: 6px;
+            padding: 7px 10px;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+
+        .edit-btn:hover {
+            background: #dbeafe;
+        }
+
         .delete-btn {
             color: #dc2626;
             background: #fef2f2;
@@ -418,6 +431,60 @@
         .delete-btn:hover {
             background: #fee2e2;
         }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.05);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-box {
+            width: 100%;
+            max-width: 450px;
+            background: white;
+            border-radius: 14px;
+            padding: 28px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15)
+        }
+
+        .modal-box h2 {
+            font-size: 19px;
+            margin-bottom: 8px;
+        }
+
+        .modal-box p{
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 22px;
+        }
+
+        .modal-box label{
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 9px;
+        }
+
+        .modal-actions {
+            display:flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .cancel-btn {
+            background: #f1f5f9;
+            color: #475569;
+            border-radius: 8px;
+            padding: 13px 17px;
+            font-size: 13px;
+        }
+
 
         .empty {
             text-align: center;
@@ -757,6 +824,16 @@
                                                 Copy
                                             </button>
 
+                                            <button
+                                                type="button"
+                                                class="edit-btn"
+                                                onclick="openEditModal(
+                                                    '<%= url.shortId%>',
+                                                    '<%= encodeURIComponent(url.redirectURL)%>'
+                                                )">
+                                                Edit
+                                            </button>
+
                                             <a
                                                 class="action-link"
                                                 href="/url/analytics/<%= url.shortId %>">
@@ -821,6 +898,52 @@
 </div>
 
 
+<!-- Edit URL Modal -->
+<div id="editModal" class="modal-overlay">
+
+    <div class="modal-box">
+
+        <h2>Edit Destination URL</h2>
+
+        <p>Update where your shortened URL redirects visitors.</p>
+
+        <form id="editForm" method="POST">
+
+            <label for="editDestination">New Destination URL</label>
+
+            <input
+                type="url"
+                id="editDestination"
+                name="url"
+                placeholder="https://example.com"
+                required
+            >
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    onclick="closeEditModal()">
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-btn">
+                    Save Changes
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
 <script>
 
     // Copy shortened URL
@@ -841,6 +964,22 @@
         }
 
     }
+    function openEditModal(shortId, encodedURL) {
+        const modal = document.getElementById("editModal");
+        const editForm = document.getElementById("editForm");
+        const destinationInput = document.getElementById("editDestination");
+
+        destinationInput.value = decodeURIComponent(encodedURL);
+
+        editForm.action = `/url/edit/${encodeURIComponent(shortId)}`;
+
+        modal.style.display = "flex";
+        destinationInput.focus();
+    }
+    function closeEditModal() {
+        document.getElementById("editModal").style.display = "none";
+    }
+
 
 
     // Search URLs

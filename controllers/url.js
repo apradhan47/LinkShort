@@ -82,6 +82,49 @@ async function handleDeleteURL(req, res) {
     return res.redirect("/");
 }
 
+
+async function handleEditURL(req, res) {
+    try {
+        const shortId = req.params.shortId;
+        const { url } = req.body;
+
+        if (!url || !url.trim()) {
+            return res.status(400).send("Destination URL is required");
+        }
+
+        let parsedURL;
+
+        try {
+            parsedURL = new globalThis.URL(url.trim());
+
+            if (!["http:", "https:"].includes(parsedURL.protocol)) {
+                throw new Error("Invalid protocol");
+            }
+        } catch (error) {
+            return res.status(400).send(
+                "Please enter a valid URL starting with http:// or https://"
+            );
+        }
+
+        const updatedURL = await URL.findOneAndUpdate(
+            { shortId },
+            { $set: { redirectURL: parsedURL.href } },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedURL) {
+            return res.status(404).send("Short URL not found");
+        }
+
+        return res.redirect("/");
+
+    } catch (error) {
+        console.error("Edit URL error:", error);
+        return res.status(500).send("Unable to update destination URL");
+    }
+}
+
+
 async function handleGenerateQRCode(req, res) {
     try {
         const shortId = req.params.shortId;
@@ -114,4 +157,5 @@ module.exports = {
     handleGetAnalytics,
     handleDeleteURL,
     handleGenerateQRCode,
+    handleEditURL,
 };
