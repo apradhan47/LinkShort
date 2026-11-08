@@ -2,73 +2,191 @@ const QRCode = require("qrcode");
 const shortid = require("shortid");
 const URL = require("../models/url");
 
+
 async function handleGenerateNewShortURL(req, res) {
-    const body = req.body;
-
-    if (!body.url) {
-        return res.status(400).send("URL is required");
-    }
-
-    // Validate URL
-    let parsedURL;
-
     try {
-        parsedURL = new globalThis.URL(body.url);
+        const body = req.body;
 
-        if (!["http:", "https:"].includes(parsedURL.protocol)) {
-            throw new Error("Invalid protocol");
+        if (!body.url) {
+            return res.status(400).send("URL is required");
         }
+
+        // Validate destination URL
+        let parsedURL;
+
+        try {
+            parsedURL = new globalThis.URL(body.url);
+
+            if (!["http:", "https:"].includes(parsedURL.protocol)) {
+                throw new Error("Invalid protocol");
+            }
+        } catch (error) {
+            const allurls = await URL.find({});
+
+            return res.status(400).render("home", {
+                urls: allurls,
+                error: "Please enter a valid URL starting with http:// or https://"
+            });
+        }
+
+        // Generate short ID
+        const shortID = body.customId && body.customId.trim()
+            ? body.customId.trim()
+            : shortid();
+        if (!/^[a-zA-Z0-9_-]+$/.test(shortID)) {
+            return res.status(400).send(
+                "Custom alias can only contain letters, numbers, hyphens, and underscores."
+            );
+        }
+        if (shortID.length > 50) {
+            return res.status(400).send(
+                "Custom alias cannot exceed 50 characters."
+            );
+        }
+
+        // Check whether custom ID already exists
+        const existingURL = await URL.findOne({ shortId: shortID });
+
+        if (existingURL) {
+            const allurls = await URL.find({});
+
+            return res.status(400).render("home", {
+                urls: allurls,
+                error: "This custom URL is already taken. Please choose another one."
+            });
+        }
+
+        // Calculate expiration date
+        let expiresAt = null;
+
+        const expiryDuration = body.expiryDuration;
+        const expiryDate = body.expiryDate;
+
+        if (expiryDuration && expiryDate) {
+            return res.status(400).send("Please select only one expiration option.");
+        }
+
+        if (expiryDuration) {
+            const allowedDurations = [1, 7, 30, 90];
+            const days = Number(expiryDuration);
+
+            if (!allowedDurations.includes(days)) {
+                return res.status(400).send("Invalid expiration duration.");
+            }
+
+            expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+        }
+
+        else if (expiryDate) {
+            const timezoneOffset = Number(body.timezoneOffset);
+            if (
+                !Number.isInteger(timezoneOffset) ||
+                timezoneOffset < -840 ||
+                timezoneOffset > 840
+            ) {
+                return res.status(400).send("Invalid timezone information.");
+            }
+            const [year, month, day] = expiryDate.split("-").map(Number);
+            const selectedDate = new Date(
+                Date.UTC(year, month - 1, day, 23, 59, 59, 999)
+                + timezoneOffset * 60 * 1000
+            );
+            if (
+                selectedDate.getUTCFullYear() !== year ||
+                selectedDate.getUTCMonth() !== month - 1 ||
+                selectedDate.getUTCDate() !== day
+            ) {
+                return res.status(400).send("Invalid expiration date.");
+            }
+            if (selectedDate <= new Date()) {
+                return res.status(400).send("Expiration date must be in the future.");
+            }
+            expiresAt = selectedDate;
+        }
+
+        // Save URL in MongoDB
+        await URL.create({
+            shortId: shortID,
+            redirectURL: parsedURL.href,
+            visitHistory: [],
+            expiresAt: expiresAt,
+        });
+
+       return res.redirect(`/?created=${encodeURIComponent(shortID)}`);
+
     } catch (error) {
-        const allurls = await URL.find({});
-        return res.status(400).render("home", {
-            urls: allurls,
-            error: "Please enter a valid URL starting with http:// or https://"
-        });
+        console.error("URL creation error:", error);
+        return res.status(500).send("Unable to create short URL.");
     }
-
-    const shortID = body.customId && body.customId.trim()
-        ? body.customId.trim()
-        : shortid();
-
-    const existingURL =await URL.findOne ({ shortId: shortID});
-    if (existingURL) {
-        const allurls = await URL.find ({});
-
-        return res.status(400).render("home",{
-            urls: allurls,
-            error:"This custom URL is already taken. Please choose another one.",
-        });
-    }
-
-    await URL.create({
-        shortId: shortID,
-        redirectURL: parsedURL.href,
-        visitHistory: [],
-    });
-
-    const allurls = await URL.find({});
-
-    return res.render("home", {
-        id: shortID,
-        urls: allurls,
-    });
 }
+
+
 
 
 async function handleGetAnalytics(req, res) {
-    const shortId = req.params.shortId;
+    try {
+        const shortId = req.params.shortId;
 
-    const result = await URL.findOne({ shortId });
+        const result = await URL.findOne({ shortId });
 
-    if (!result) {
-        return res.status(404).send("Short URL not found");
+        if (!result) {
+            return res.status(404).send("Short URL not found");
+        }
+
+        const visits = result.visitHistory || [];
+
+        // Count device types
+        const deviceStats = {};
+
+        // Count browsers
+        const browserStats = {};
+
+        // Count traffic sources
+        const sourceStats = {};
+
+        visits.forEach((visit) => {
+
+            // Device breakdown
+            const device = visit.device || "Unknown";
+            deviceStats[device] = (deviceStats[device] || 0) + 1;
+
+            // Browser breakdown
+            const browser = visit.browser || "Unknown";
+            browserStats[browser] = (browserStats[browser] || 0) + 1;
+
+            // Traffic source breakdown
+            let source = "Direct";
+
+            if (visit.referrer && visit.referrer !== "Direct") {
+                try {
+                    const parsedReferrer = new globalThis.URL(visit.referrer);
+                    source = parsedReferrer.hostname.replace(/^www\./, "");
+                } catch (error) {
+                    source = "Other";
+                }
+            }
+
+            sourceStats[source] = (sourceStats[source] || 0) + 1;
+
+        });
+
+        return res.render("analytics", {
+            url: result,
+            totalClicks: visits.length,
+
+            analytics: {
+                devices: deviceStats,
+                browsers: browserStats,
+                sources: sourceStats
+            }
+        });
+
+    } catch (error) {
+        console.error("Analytics error:", error);
+        return res.status(500).send("Unable to load analytics.");
     }
-
-    return res.render("analytics", {
-        url: result,
-        totalClicks: result.visitHistory.length,
-    });
 }
+
 
 async function handleDeleteURL(req, res) {
     const shortId = req.params.shortId;
@@ -125,6 +243,107 @@ async function handleEditURL(req, res) {
 }
 
 
+async function handleEditExpiration(req, res) {
+    try {
+        const shortId = req.params.shortId;
+
+        const { expiryDuration, expiryDate } = req.body;
+
+        let expiresAt = null;
+
+        // Prevent selecting both options
+        if (expiryDuration && expiryDate) {
+            return res.status(400).send(
+                "Please select only one expiration option."
+            );
+        }
+
+        // Handle preset durations
+        if (expiryDuration) {
+            const allowedDurations = [1, 7, 30, 90];
+            const days = Number(expiryDuration);
+
+            if (!allowedDurations.includes(days)) {
+                return res.status(400).send(
+                    "Invalid expiration duration."
+                );
+            }
+
+            expiresAt = new Date(
+                Date.now() + days * 24 * 60 * 60 * 1000
+            );
+        }
+
+        // Handle custom calendar date
+        else if (expiryDate) {
+            const timezoneOffset = Number(req.body.timezoneOffset);
+
+            if (
+                !Number.isInteger(timezoneOffset) ||
+                timezoneOffset < -840 ||
+                timezoneOffset > 840
+            ) {
+                return res.status(400).send(
+                    "Invalid timezone information."
+                );
+            }
+
+            const [year, month, day] = expiryDate.split("-").map(Number);
+
+            const selectedDate = new Date(
+                Date.UTC(year, month - 1, day, 23, 59, 59, 999)
+                + timezoneOffset * 60 * 1000
+            );
+
+            if (
+                selectedDate.getUTCFullYear() !== year ||
+                selectedDate.getUTCMonth() !== month - 1 ||
+                selectedDate.getUTCDate() !== day
+            ) {
+                return res.status(400).send(
+                    "Invalid expiration date."
+                );
+            }
+
+            if (selectedDate <= new Date()) {
+                return res.status(400).send(
+                    "Expiration date must be in the future."
+                );
+            }
+
+            expiresAt = selectedDate;
+        }
+
+        // Update only the expiration field
+        const updatedURL = await URL.findOneAndUpdate(
+            { shortId },
+            {
+                $set: {
+                    expiresAt: expiresAt
+                }
+            },
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+
+        if (!updatedURL) {
+            return res.status(404).send("Short URL not found");
+        }
+
+        return res.redirect("/");
+
+    } catch (error) {
+        console.error("Edit expiration error:", error);
+        return res.status(500).send(
+            "Unable to update link expiration."
+        );
+    }
+}
+
+
+
 async function handleGenerateQRCode(req, res) {
     try {
         const shortId = req.params.shortId;
@@ -152,10 +371,34 @@ async function handleGenerateQRCode(req, res) {
     }
 }
 
+// Activate / Deactivate URL
+async function handleToggleURLStatus(req, res) {
+    try {
+        const { shortId } = req.params;
+
+        const url = await URL.findOne({ shortId });
+
+        if (!url) {
+            return res.status(404).send("Short URL not found");
+        }
+
+        url.isActive = !url.isActive;
+
+        await url.save();
+
+        return res.redirect('/');
+    } catch (error) {
+        console.error("Toggle URL status error:", error);
+        return res.status(500).send("Unable to update link status");
+    }
+}
+
 module.exports = {
     handleGenerateNewShortURL,
     handleGetAnalytics,
     handleDeleteURL,
     handleGenerateQRCode,
     handleEditURL,
+    handleEditExpiration,
+    handleToggleURLStatus,
 };

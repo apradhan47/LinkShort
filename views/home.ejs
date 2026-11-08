@@ -135,6 +135,10 @@
             margin-bottom: 28px;
         }
 
+        #analytics-overview {
+            scroll-margin-top: 25px;
+        }
+
         .stat-card {
             background: white;
             border: 1px solid var(--border);
@@ -195,6 +199,82 @@
             color: var(--muted);
         }
 
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 18px;
+        }
+
+        .qr-card {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px;
+            background: white;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            cursor: pointer;
+        }
+
+        .qr-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.10);
+            border-color: #bfdbfe;
+        }
+
+        .qr-preview {
+            transition: transform 0.25s ease;
+        }
+
+        .qr-card:hover .qr-preview {
+            transform: scale(1.04);
+        }
+
+        .qr-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .qr-download {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 9px 12px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .qr-card h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .qr-card p {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 15px;
+            overflow-wrap: anywhere;
+        }
+
+        .qr-btn {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary);
+            text-decoration: none;
+            padding: 9px 12px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+
         /* URL form */
 
         .form-grid {
@@ -238,6 +318,62 @@
 
         .primary-btn:hover {
             background: var(--primary-hover);
+        }
+
+        .expiry-section {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .expiry-section h3 {
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .expiry-section p {
+            font-size:12px;
+            color: var(--muted);
+            margin-bottom: 18px;
+        }
+
+        .expiry-section label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .expiry-section select,
+        .expiry-section input {
+            max-width: 350px;
+            display: block;
+        }
+
+        .expiry-section select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dbe2ea;
+            border-radius: 8px;
+            background: white;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .expiry-divider {
+             max-width: 350px;
+             text-align: center;
+             color: #94a3b8;
+             font-size: 11px;
+             font-weight: 600;
+             margin: 16px 0;
+        }
+
+        .expiry-section small {
+            display: block;
+            margin-top: 9px;
+            color: var(--muted);
+            font-size: 11px;
         }
 
         /* Success and error messages */
@@ -371,6 +507,42 @@
             border-radius: 20px;
             padding: 6px 12px;
             font-weight: 600;
+        }
+
+        .expiry-status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .expiry-active {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .expiry-expired {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .expiry-never {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .expiry-disabled {
+            background: #fff7ed;
+            color: #c2410c;
+        }
+
+        .expiry-date {
+            display:block;
+            margin-top: 6px;
+            color: #64748b;
+            font-size: 11px;
         }
 
         /* Actions */
@@ -615,8 +787,14 @@
             MANAGEMENT
         </div>
 
-        <a href="#url-history" class="nav-link">◷ &nbsp; Analytics</a>
-        <a href="#url-history" class="nav-link">▧ &nbsp; QR Codes</a>
+        <a href="#analytics-overview" class="nav-link"
+           onclick="event.preventDefault();
+           const section = document.getElementById('analytics-overview');
+           const position = section.getBoundingClientRect().top + window.scrollY - 25;
+           window.scrollTo({ top: position, behavior: 'smooth' });">
+           ◷ &nbsp; Analytics
+        </a>
+        <a href="#qr-codes" class="nav-link">▧ &nbsp; QR Codes</a>
 
     </aside>
 
@@ -663,7 +841,37 @@
 
         </section>
 
+        <section class="stats" id="analytics-overview">
+            <div class="stat-card">
+                <div class="stat-icon">ACTIVE</div>
+                <p>Active Links</p>
+                <h2><%= dashboardStats.activeLinks %></h2>
+            </div>
 
+            <div class="stat-card">
+                <div class="stat-icon">DISABLED</div>
+                <p>Disabled Links</p>
+                <h2><%= dashboardStats.disabledLinks %></h2>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">EXPIRED</div>
+                <p>Expired Links</p>
+                <h2><%= dashboardStats.expiredLinks %></h2>
+            </div>
+
+        </section>
+
+        <section class="panel">
+            <div class="panel-heading">
+                <h2>Click Performance Overview</h2>
+                <p>Track your total link clicks over the last 7 days.</p>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="dashboardClicksChart"></canvas>
+            </div>
+        </section>
         <!-- Create URL -->
 
         <section class="panel">
@@ -694,6 +902,41 @@
                         + Generate Link
                     </button>
 
+                </div>
+
+                <div class="expiry-section">
+
+                    <h3>Link Expiration</h3>
+
+                    <p>Choose how long your shortened URL should remain active.</p>
+
+                    <label for="expiryDuration">Choose a Duration</label>
+
+                    <select name="expiryDuration" id="expiryDuration">
+                        <option value="">Never expires</option>
+                        <option value="1">1 Day</option>
+                        <option value="7">7 Days</option>
+                        <option value="30">30 Days</option>
+                        <option value="90">90 Days</option>
+                    </select>
+
+                    <div class="expiry-divider">OR</div>
+
+                    <label for="expiryDate">Select a specific expiry date</label>
+
+                    <input
+                       type="date"
+                       name="expiryDate"
+                       id="expiryDate"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="timezoneOffset"
+                        id="timezoneOffset"
+                    >
+
+                    <small>Leave both options empty if you don't want the link to expire.</small>
                 </div>
 
             </form>
@@ -776,6 +1019,7 @@
                             <th>Short Link</th>
                             <th>Destination</th>
                             <th>Total Clicks</th>
+                            <th>Expiry / Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -814,8 +1058,53 @@
                                     </td>
 
                                     <td>
+                                        <% if (url.expiresAt && new Date(url.expiresAt) <= new Date()) { %>
+                                            <span class="expiry-status expiry-expired">
+                                                Expired
+                                            </span>
+
+                                            <%} else if (url.isActive === false) {%>
+
+                                                <span class="expiry-status expiry-disabled">
+                                                    Disabled
+                                                </span>
+                                            <%}  else if (url.expiresAt) {%>
+                                                <span class ="expiry-status expiry-active">
+                                                    Active
+                                                </span>
+
+                                            <% } else { %>
+                                                 <span class="expiry-status expiry-never">
+                                                    Never expires
+                                                 </span>
+                                            <% } %>
+
+                                            <% if (url.expiresAt) { %>
+                                                <span class="expiry-date">
+                                                    <%=new Date(url.expiresAt).toLocaleDateString('en-IN',{
+                                                        day: '2-digit',
+                                                        month: 'short',
+                                                        year: 'numeric'
+                                                    }) %>
+                                                </span>
+                                            <%}%>
+                                    </td>
+
+                                    <td>
 
                                         <div class="actions">
+
+                                            <form
+                                               method="POST"
+                                               action="/url/toggle/<%= url.shortId %>"
+                                               onsubmit="return confirm('Are you sure you want to change this link status?');">
+
+                                               <button
+                                                   type="submit"
+                                                   class="edit-btn">
+                                                   <%= url.isActive === false ? 'Activate' : 'Deactivate' %>
+                                                </button>
+                                            </form>
 
                                             <button
                                                 type="button"
@@ -832,6 +1121,16 @@
                                                     '<%= encodeURIComponent(url.redirectURL)%>'
                                                 )">
                                                 Edit
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                class="edit-btn"
+                                                onclick="openExpirationModal(
+                                                    '<%= url.shortId %>',
+                                                    '<%= url.expiresAt ? new Date(url.expiresAt).toISOString() : "" %>'
+                                                )">
+                                                 Expiration
                                             </button>
 
                                             <a
@@ -870,7 +1169,7 @@
                         <% } else { %>
 
                             <tr>
-                                <td colspan="5" class="empty">
+                                <td colspan="6" class="empty">
                                     No URLs generated yet. Create your first short link above!
                                 </td>
                             </tr>
@@ -891,6 +1190,50 @@
                 No matching URLs found.
             </p>
 
+        </section>
+
+        <section class="panel" id="qr-codes">
+            <div class="panel-heading">
+                <h2>Your QR Codes</h2>
+                <p>View and download QR codes for your shortened links.</p>
+            </div>
+            <div class="qr-grid">
+                <% if (urls && urls.length > 0) { %>
+                    <% urls.forEach(url => { %>
+                        <div class="qr-card">
+                            <h3><%= url.shortId %></h3>
+
+                            <p><%=url.redirectURL%></p>
+
+                            <img
+                                src="<%=url.qrCode%>"
+                                alt="QR Code for <%=url.shortId %>"
+                                class="qr-preview"
+                            >
+
+                            <div class="qr-actions">
+                                <a
+                                  href="<%= url.qrCode %>"
+                                  download="LinkShort-<%= url.shortId %>.png"
+                                  class="qr-download">
+                                  Download QR
+                                </a>
+
+                                <a 
+                                   href = "/url/qrcode/<%= url.shortId%>"
+                                   class="qr-btn">
+                                   View QR                                
+                                </a>
+                            </div>
+                            
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p class="empty">
+                        No shortened URLs available. Create a link first!
+                    </p>
+                <% } %>
+            </div>
         </section>
 
     </main>
@@ -943,7 +1286,74 @@
 </div>
 
 
+<!-- Edit Expiration Modal -->
+<div id="expirationModal" class="modal-overlay">
 
+    <div class="modal-box">
+
+        <h2>Edit Link Expiration</h2>
+
+        <p>Change when this shortened URL should expire.</p>
+
+        <form id="expirationForm" method="POST">
+
+            <label for="editExpiryDuration">Choose a Duration</label>
+
+            <select
+                name="expiryDuration"
+                id="editExpiryDuration"
+                style="width: 100%; padding: 12px; border: 1px solid #dbe2ea; border-radius: 8px; background: white; font-family: inherit; margin-bottom: 18px;">
+
+                <option value="">No preset duration</option>
+                <option value="1">1 Day</option>
+                <option value="7">7 Days</option>
+                <option value="30">30 Days</option>
+                <option value="90">90 Days</option>
+
+            </select>
+
+            <label for="editExpiryDate">Or select a specific expiry date</label>
+
+            <input
+                type="date"
+                name="expiryDate"
+                id="editExpiryDate"
+            >
+
+            <input
+                type="hidden"
+                name="timezoneOffset"
+                id="editTimezoneOffset"
+            >
+
+            <p style="margin-top: 12px; margin-bottom: 0;">
+                Leave both options empty to make the link never expire.
+            </p>
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    onclick="closeExpirationModal()">
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-btn">
+                    Save Changes
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 
     // Copy shortened URL
@@ -964,6 +1374,28 @@
         }
 
     }
+    document.getElementById("timezoneOffset").value =new Date().getTimezoneOffset();
+    const expiryDuration = document.getElementById("expiryDuration");
+    const expiryDate = document.getElementById("expiryDate");
+
+    expiryDuration.addEventListener("change", function () {
+        if (this.value) {
+            expiryDate.value = "";
+        }
+    });
+
+    expiryDate.addEventListener("change", function () {
+        if (this.value) {
+            expiryDuration.value = "";
+        }
+    });
+
+    const today = new Date();
+    const localToday = new Date(
+            today.getTime() - today.getTimezoneOffset() * 60000
+        ).toISOString().split("T")[0];
+    expiryDate.min = localToday;
+
     function openEditModal(shortId, encodedURL) {
         const modal = document.getElementById("editModal");
         const editForm = document.getElementById("editForm");
@@ -979,6 +1411,68 @@
     function closeEditModal() {
         document.getElementById("editModal").style.display = "none";
     }
+    
+// Open the Edit Expiration modal
+function openExpirationModal(shortId, currentExpiry) {
+
+    const modal = document.getElementById("expirationModal");
+    const form = document.getElementById("expirationForm");
+
+    const durationInput = document.getElementById("editExpiryDuration");
+    const dateInput = document.getElementById("editExpiryDate");
+
+    // Set the correct backend route
+    form.action = `/url/edit-expiration/${encodeURIComponent(shortId)}`;
+
+    // Reset previous selections
+    durationInput.value = "";
+    dateInput.value = "";
+
+    // Display the existing expiry date, if available
+    if (currentExpiry) {
+        const date = new Date(currentExpiry);
+
+        const localDate = new Date(
+            date.getTime() - date.getTimezoneOffset() * 60000
+        ).toISOString().split("T")[0];
+
+        dateInput.value = localDate;
+    }
+
+    // Set browser timezone
+    document.getElementById("editTimezoneOffset").value =
+        new Date().getTimezoneOffset();
+
+    // Prevent selecting a past date
+    const today = new Date();
+
+    const localToday = new Date(
+        today.getTime() - today.getTimezoneOffset() * 60000
+    ).toISOString().split("T")[0];
+
+    dateInput.min = localToday;
+
+    modal.style.display = "flex";
+}
+
+// Close the Edit Expiration modal
+function closeExpirationModal() {
+    document.getElementById("expirationModal").style.display = "none";
+}
+
+// Keep preset duration and custom date mutually exclusive
+document.getElementById("editExpiryDuration").addEventListener("change", function () {
+    if (this.value) {
+        document.getElementById("editExpiryDate").value = "";
+    }
+});
+
+document.getElementById("editExpiryDate").addEventListener("change", function () {
+    if (this.value) {
+        document.getElementById("editExpiryDuration").value = "";
+    }
+});
+
 
 
 
@@ -1077,8 +1571,46 @@ function updateLinks() {
 // Listen for search and sorting changes
 searchInput.addEventListener("input", updateLinks);
 sortSelect.addEventListener("change", updateLinks);
+const dailyClicks = <%- JSON.stringify(dailyClicks || []) %>;
 
+    const chartCanvas = document.getElementById("dashboardClicksChart");
+
+    if (chartCanvas) {
+        new Chart(chartCanvas, {
+            type: "line",
+            data: {
+                labels: dailyClicks.map(item => item.date),
+                datasets: [{
+                    label: "Clicks",
+                    data: dailyClicks.map(item => item.clicks),
+                    borderColor: "#2563eb",
+                    backgroundColor: "rgba(37, 99, 235, 0.10)",
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: "#2563eb"
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    }
 </script>
-
 </body>
 </html>

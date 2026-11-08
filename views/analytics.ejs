@@ -179,15 +179,60 @@
 
         <div class="card">
             <h2>Click Performance</h2>
-            <p class="chart-description">
+            <p class="chart-description" id="clickChartDescription">
                 Track how many times your shortened URL was visited over the last 7 days.
             </p>
+
+            <select id="clickRange" style="
+                margin-top: 15px;
+                padding: 10px 14px;
+                border: 1px solid #dbe2ea;
+                border-radius: 8px;
+                background: white;
+                font-size: 13px;
+                cursor: pointer;
+            ">
+               <option value="7">Last 7 Days</option>
+               <option value="30">Last 30 Days</option>
+            </select>
 
             <div class="chart-container">
                 <canvas id="clickChart"></canvas>
             </div>
         </div>
 
+        <div class="card">
+            <h2>Device Breakdown</h2>
+            <p class="chart-description">
+                See which devices visitors use to open your links.
+            </p>
+
+            <div class="chart-container">
+                <canvas id="deviceChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Browser Breakdown</h2>
+            <p class="chart-description">
+                Discover which browsers your visitors use,
+            </p>
+
+            <div class="chart-container">
+                <canvas id="browserChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Traffic Sources</h2>
+            <p class="chart-description">
+                Understand where your link clicks are coming from.
+            </p>
+
+            <div class="chart-container">
+                <canvas id="sourceChart"></canvas>
+            </div>
+        </div>
     </div>
 
     <div class="card">
@@ -254,21 +299,52 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    // Get visit timestamps from MongoDB through EJS
-    const visitHistory = <%- JSON.stringify(
-        url.visitHistory.map(visit => visit.timestamp)
-    ) %>;
 
-    // Generate the last 7 days, including today
-    const labels = [];
-    const clickCounts = [];
+// Get visit timestamps from MongoDB through EJS
+const visitHistory = <%- JSON.stringify(
+    url.visitHistory.map(visit => visit.timestamp)
+) %>;
 
-    const today = new Date();
+// Get analytics data calculated by the backend
+const analytics = <%- JSON.stringify(analytics) %>;
 
-    for (let i = 6; i >= 0; i--) {
+// Helper function to create chart data
+function getChartData(data) {
+    const entries = Object.entries(data || {});
+
+    if (entries.length === 0) {
+        return {
+            labels: ["No data yet"],
+            values: [0]
+        };
+    }
+
+    return {
+        labels: entries.map(entry => entry[0]),
+        values: entries.map(entry => entry[1])
+    };
+}
+
+// Generate the last 7 days, including today
+
+// Click Performance Chart
+
+const clickRange = document.getElementById('clickRange');
+const clickDescription = document.getElementById('clickChartDescription');
+
+const labels = [];
+const clickCounts = [];
+
+const today = new Date();
+
+function generateClickChart(days) {
+
+    labels.length = 0;
+    clickCounts.length = 0;
+
+    for (let i = days - 1; i >= 0; i--) {
 
         const date = new Date(today);
-
         date.setDate(today.getDate() - i);
 
         const year = date.getFullYear();
@@ -284,7 +360,6 @@
             })
         );
 
-        // Count visits for this particular day
         const count = visitHistory.filter(timestamp => {
 
             if (!timestamp) return false;
@@ -305,64 +380,187 @@
         clickCounts.push(count);
     }
 
-    // Create the chart
-    const ctx = document.getElementById('clickChart');
+    clickChart.data.labels = labels;
+    clickChart.data.datasets[0].data = clickCounts;
 
-    new Chart(ctx, {
+    clickChart.update();
 
-        type: 'bar',
+    clickDescription.textContent =
+        `Track how many times your shortened URL was visited over the last ${days} days.`;
+}
 
-        data: {
-            labels: labels,
+// Create initial chart
+const ctx = document.getElementById('clickChart');
 
-            datasets: [{
-                label: 'Total Clicks',
-                data: clickCounts,
+const clickChart = new Chart(ctx, {
 
-                backgroundColor: '#3b82f6',
-                borderRadius: 7,
-                barThickness: 30
-            }]
+    type: 'bar',
+
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Total Clicks',
+            data: [],
+            backgroundColor: '#3b82f6',
+            borderRadius: 7,
+            barThickness: 30
+        }]
+    },
+
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+
+        plugins: {
+            legend: {
+                display: false
+            }
         },
 
-        options: {
-
-            responsive: true,
-            maintainAspectRatio: false,
-
-            plugins: {
-                legend: {
-                    display: false
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    precision: 0
+                },
+                title: {
+                    display: true,
+                    text: 'Number of Clicks'
                 }
             },
 
-            scales: {
-
-                y: {
-                    beginAtZero: true,
-
-                    ticks: {
-                        precision: 0
-                    },
-
-                    title: {
-                        display: true,
-                        text: 'Number of Clicks'
-                    }
-                },
-
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Date'
-                    }
+            x: {
+                title: {
+                    display: true,
+                    text: 'Date'
                 }
-
             }
-
         }
+    }
 
-    });
+});
+
+// Load initial 7-day data
+generateClickChart(7);
+
+// Update chart when dropdown changes
+clickRange.addEventListener('change', function () {
+    generateClickChart(Number(this.value));
+});
+
+
+// Common chart colors
+const chartColors = [
+    '#2563eb',
+    '#10b981',
+    '#f59e0b',
+    '#8b5cf6',
+    '#ef4444',
+    '#06b6d4',
+    '#64748b'
+];
+
+// Prepare device data
+const deviceData = getChartData(analytics.devices);
+
+// Device Breakdown Chart
+new Chart(document.getElementById('deviceChart'), {
+
+    type: 'doughnut',
+
+    data: {
+        labels: deviceData.labels,
+
+        datasets: [{
+            data: deviceData.values,
+            backgroundColor: chartColors,
+            borderWidth: 0
+        }]
+    },
+
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+// Prepare browser data
+const browserData = getChartData(analytics.browsers);
+
+// Browser Breakdown Chart
+new Chart(document.getElementById('browserChart'), {
+
+    type: 'doughnut',
+
+    data: {
+        labels: browserData.labels,
+
+        datasets: [{
+            data: browserData.values,
+            backgroundColor: chartColors,
+            borderWidth: 0
+        }]
+    },
+
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+// Prepare traffic source data
+const sourceData = getChartData(analytics.sources);
+
+// Traffic Sources Chart
+new Chart(document.getElementById('sourceChart'), {
+
+    type: 'bar',
+
+    data: {
+        labels: sourceData.labels,
+
+        datasets: [{
+            label: 'Visits',
+            data: sourceData.values,
+            backgroundColor: '#3b82f6',
+            borderRadius: 7
+        }]
+    },
+
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+
+        scales: {
+            x: {
+                beginAtZero: true,
+                ticks: {
+                    precision: 0
+                }
+            }
+        }
+    }
+});
+
 </script>
 </body>
 </html>
