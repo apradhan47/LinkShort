@@ -13,6 +13,40 @@ LinkShort makes long URLs easier to share and manage. It provides a centralized 
 
 The application includes individual link analytics as well as an overall dashboard for monitoring URL performance.
 
+## Application Screenshots
+
+### Dashboard Overview
+
+View overall link performance, total clicks, active links, disabled links, and expired links.
+
+![Dashboard Overview](screenshots/dashboard.png)
+
+### Link Generation
+
+Create shortened URLs with custom aliases and configurable expiration settings.
+
+![Link Generation](screenshots/link-generation.png)
+
+### URL Management
+
+Search, sort, edit, copy, activate, deactivate, and delete shortened URLs.
+
+![URL Management](screenshots/url-management.png)
+
+### Analytics Dashboard
+
+Monitor click performance and analyze individual URL engagement.
+
+![Click Performance](screenshots/click-performance.png)
+
+![URL Analytics](screenshots/url-analytics.png)
+
+### QR Code Generation
+
+Generate, view, and download QR codes for shortened URLs.
+
+![QR Codes](screenshots/qr-codes.png)
+
 ## Features
 
 - **URL Shortening:** Convert long URLs into short, shareable links.
@@ -54,6 +88,13 @@ LinkShort/
 ├── routes/
 │   ├── staticRouter.js
 │   └── url.js
+├── screenshots/
+│   ├── dashboard.png
+│   ├── link-generation.png
+│   ├── url-management.png
+│   ├── click-performance.png
+│   ├── url-analytics.png
+│   └── qr-codes.png
 ├── tests/
 │   ├── url.test.js
 │   └── rateLimiter.test.js
