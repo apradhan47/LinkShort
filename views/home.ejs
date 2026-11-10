@@ -765,6 +765,245 @@
                 max-width: 100%;
             }
         }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            overflow-x: hidden;
+        }
+        button, a, input, select {
+            -webkit-tap-highlight-color: transparent;
+        }
+        button:focus-visible,
+        a:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 3px;
+        }
+
+        .stat-card {
+            min-width: 0;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.025);
+        }
+
+        .stat-card h2 {
+            overflow-wrap: anywhere;
+        }
+
+        .panel {
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.025);
+        }
+
+        .panel-heading h2 {
+            letter-spacing: -0.3px;
+        }
+
+        .search-input,
+        .sort-select {
+            min-height: 42px;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .toolbar-right {
+            flex-wrap: wrap;
+        }
+
+        .table-wrapper {
+            border: 1px solid var(--border);
+            border-radius: 9px;
+        }
+
+        table {
+            min-width: 850px;
+        }
+
+        td {
+            vertical-align: middle;
+        }
+
+        .actions {
+            min-width: 230px;
+        }
+
+        .qr-card {
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+           text-align: center;
+           min-width: 0;
+        }
+
+        .qr-card h3,
+        .qr-card p {
+            width: 100%;
+        }
+
+        .qr-preview {
+           display: block;
+           width: 170px;
+           height: 170px;
+           object-fit: contain;
+           margin: 12px auto 18px;
+        }
+
+        .qr-actions {
+            justify-content: center;
+            margin-top: auto;
+        }
+
+        .form-grid input,.expiry-section select,
+        .expiry-section input {
+           min-height: 45px;
+        }
+        .primary-btn,
+        .copy-btn,
+        .edit-btn,
+        .delete-btn,
+        .qr-download,
+        .qr-btn,
+        .cancel-btn {
+            min-height: 38px;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        .modal-overlay {
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(3px);
+        }
+        .modal-box {
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-box input,
+        .modal-box select {
+            min-height: 44px;
+        }
+        
+        @media (max-width: 1000px) {
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            
+            .main {
+                padding: 28px 20px;
+            }
+        }
+        
+        @media (max-width: 650px) {
+            .layout {
+                display: block;
+            }
+            .sidebar {
+                position: relative;
+                width: 100%;
+                padding: 15px;
+            }
+            .brand {
+                font-size: 23px;
+                margin-bottom: 12px;
+            }
+            .sidebar > a {
+                display: inline-block;
+            }
+            .main {
+                padding: 22px 14px;
+            }
+            .topbar {
+                align-items: flex-start;
+                margin-bottom: 24px;
+            }
+            .topbar h1 {
+                font-size: 21px;
+            }
+             .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+            
+            .stat-card {
+                padding: 15px;
+            }
+            .stat-card h2 {
+                font-size: 23px;
+            }
+            .stat-card p {
+                font-size: 12px;
+            }
+            .panel {
+                padding: 16px;
+                margin-bottom: 18px;
+            }
+            .chart-container {
+                height: 240px;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-grid button {
+                grid-column: auto;
+                width: 100%;
+            }
+
+            .expiry-section select,
+            .expiry-section input {
+                max-width: 100%;
+            }
+            .table-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .toolbar-right {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 9px;
+            }
+            .sort-select {
+                width: 100%;
+            }
+            .qr-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+            .qr-card {
+                padding: 12px 8px;
+            }
+            .qr-preview {
+                width: 125px;
+                height: 125px;
+            }
+            .qr-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            .qr-actions a {
+                text-align: center;
+                width: 100%;
+            }
+            .modal-overlay {
+                padding: 12px;
+            }
+            .modal-box {
+                padding: 20px;
+            }
+        }
+        @media (max-width: 360px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            .qr-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
     </style>
 </head>
 

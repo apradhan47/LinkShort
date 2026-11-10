@@ -8,7 +8,7 @@ async function handleGenerateNewShortURL(req, res) {
         const body = req.body;
 
         if (!body.url) {
-            return res.status(400).send("URL is required");
+            return res.redirect("/?error=missing-url");
         }
 
         // Validate destination URL
@@ -21,12 +21,7 @@ async function handleGenerateNewShortURL(req, res) {
                 throw new Error("Invalid protocol");
             }
         } catch (error) {
-            const allurls = await URL.find({});
-
-            return res.status(400).render("home", {
-                urls: allurls,
-                error: "Please enter a valid URL starting with http:// or https://"
-            });
+            return res.redirect("/?error=invalid-url");
         }
 
         // Generate short ID
@@ -34,26 +29,17 @@ async function handleGenerateNewShortURL(req, res) {
             ? body.customId.trim()
             : shortid();
         if (!/^[a-zA-Z0-9_-]+$/.test(shortID)) {
-            return res.status(400).send(
-                "Custom alias can only contain letters, numbers, hyphens, and underscores."
-            );
+            return res.redirect("/?error=invalid-alias");
         }
         if (shortID.length > 50) {
-            return res.status(400).send(
-                "Custom alias cannot exceed 50 characters."
-            );
+            return res.redirect("/?error=alias-too-long");
         }
 
         // Check whether custom ID already exists
         const existingURL = await URL.findOne({ shortId: shortID });
 
         if (existingURL) {
-            const allurls = await URL.find({});
-
-            return res.status(400).render("home", {
-                urls: allurls,
-                error: "This custom URL is already taken. Please choose another one."
-            });
+            return res.redirect("/?error=duplicate-alias");
         }
 
         // Calculate expiration date
@@ -63,7 +49,7 @@ async function handleGenerateNewShortURL(req, res) {
         const expiryDate = body.expiryDate;
 
         if (expiryDuration && expiryDate) {
-            return res.status(400).send("Please select only one expiration option.");
+            return res.redirect("/?error=multiple-expiry");
         }
 
         if (expiryDuration) {
@@ -71,7 +57,7 @@ async function handleGenerateNewShortURL(req, res) {
             const days = Number(expiryDuration);
 
             if (!allowedDurations.includes(days)) {
-                return res.status(400).send("Invalid expiration duration.");
+                return res.redirect("/?error=invalid-duration");
             }
 
             expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
@@ -84,7 +70,7 @@ async function handleGenerateNewShortURL(req, res) {
                 timezoneOffset < -840 ||
                 timezoneOffset > 840
             ) {
-                return res.status(400).send("Invalid timezone information.");
+                return res.redirect("/?error=invalid-timezone");
             }
             const [year, month, day] = expiryDate.split("-").map(Number);
             const selectedDate = new Date(
@@ -96,10 +82,10 @@ async function handleGenerateNewShortURL(req, res) {
                 selectedDate.getUTCMonth() !== month - 1 ||
                 selectedDate.getUTCDate() !== day
             ) {
-                return res.status(400).send("Invalid expiration date.");
+                return res.redirect("/?error=invalid-date");
             }
             if (selectedDate <= new Date()) {
-                return res.status(400).send("Expiration date must be in the future.");
+                return res.redirect("/?error=past-expiry");
             }
             expiresAt = selectedDate;
         }
@@ -116,6 +102,10 @@ async function handleGenerateNewShortURL(req, res) {
 
     } catch (error) {
         console.error("URL creation error:", error);
+        if (error.code === 11000) {
+            return res.redirect("/?error=duplicate-alias");
+        }
+
         return res.status(500).send("Unable to create short URL.");
     }
 }
@@ -169,9 +159,11 @@ async function handleGetAnalytics(req, res) {
             sourceStats[source] = (sourceStats[source] || 0) + 1;
 
         });
-
+        
+        const baseURL = (process.env.BASE_URL || `${req.protocol}://${req.get("host")}`).replace(/\/$/, "");
         return res.render("analytics", {
             url: result,
+            baseURL,
             totalClicks: visits.length,
 
             analytics: {
@@ -189,15 +181,21 @@ async function handleGetAnalytics(req, res) {
 
 
 async function handleDeleteURL(req, res) {
-    const shortId = req.params.shortId;
+    try {
+        const shortId = req.params.shortId;
 
-    const deletedURL = await URL.findOneAndDelete({ shortId });
+        const deletedURL = await URL.findOneAndDelete({ shortId });
 
-    if (!deletedURL) {
-        return res.status(404).send("Short URL not found");
+        if (!deletedURL) {
+            return res.status(404).send("Short URL not found");
+        }
+
+        return res.redirect("/");
+
+    } catch (error) {
+        console.error("URL deletion error:", error);
+        return res.status(500).send("Unable to delete short URL.");
     }
-
-    return res.redirect("/");
 }
 
 
@@ -207,7 +205,7 @@ async function handleEditURL(req, res) {
         const { url } = req.body;
 
         if (!url || !url.trim()) {
-            return res.status(400).send("Destination URL is required");
+           return res.redirect("/?error=missing-url");
         }
 
         let parsedURL;
@@ -219,9 +217,7 @@ async function handleEditURL(req, res) {
                 throw new Error("Invalid protocol");
             }
         } catch (error) {
-            return res.status(400).send(
-                "Please enter a valid URL starting with http:// or https://"
-            );
+            return res.redirect("/?error=invalid-url");
         }
 
         const updatedURL = await URL.findOneAndUpdate(
@@ -238,7 +234,7 @@ async function handleEditURL(req, res) {
 
     } catch (error) {
         console.error("Edit URL error:", error);
-        return res.status(500).send("Unable to update destination URL");
+        return res.redirect("/?error=edit-failed");
     }
 }
 
@@ -253,9 +249,7 @@ async function handleEditExpiration(req, res) {
 
         // Prevent selecting both options
         if (expiryDuration && expiryDate) {
-            return res.status(400).send(
-                "Please select only one expiration option."
-            );
+           return res.redirect("/?error=multiple-expiry");
         }
 
         // Handle preset durations
@@ -264,9 +258,7 @@ async function handleEditExpiration(req, res) {
             const days = Number(expiryDuration);
 
             if (!allowedDurations.includes(days)) {
-                return res.status(400).send(
-                    "Invalid expiration duration."
-                );
+                return res.redirect("/?error=invalid-duration");
             }
 
             expiresAt = new Date(
@@ -283,9 +275,7 @@ async function handleEditExpiration(req, res) {
                 timezoneOffset < -840 ||
                 timezoneOffset > 840
             ) {
-                return res.status(400).send(
-                    "Invalid timezone information."
-                );
+                return res.redirect("/?error=invalid-timezone");
             }
 
             const [year, month, day] = expiryDate.split("-").map(Number);
@@ -300,15 +290,11 @@ async function handleEditExpiration(req, res) {
                 selectedDate.getUTCMonth() !== month - 1 ||
                 selectedDate.getUTCDate() !== day
             ) {
-                return res.status(400).send(
-                    "Invalid expiration date."
-                );
+                return res.redirect("/?error=invalid-date");
             }
 
             if (selectedDate <= new Date()) {
-                return res.status(400).send(
-                    "Expiration date must be in the future."
-                );
+                return res.redirect("/?error=past-expiry");
             }
 
             expiresAt = selectedDate;
@@ -336,9 +322,7 @@ async function handleEditExpiration(req, res) {
 
     } catch (error) {
         console.error("Edit expiration error:", error);
-        return res.status(500).send(
-            "Unable to update link expiration."
-        );
+        return res.redirect("/?error=expiration-failed");
     }
 }
 

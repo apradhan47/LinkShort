@@ -1,147 +1,154 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>URL Analytics | LinkShort</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #2563eb;
+            --background: #f8fafc;
+            --surface: #fff;
+            --text: #172033;
+            --muted: #64748b;
+            --border: #e8edf4;
         }
 
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f4f6fb;
-            color: #1e293b;
-            padding: 40px 20px;
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            padding: 35px 20px;
         }
 
-        .container {
-            max-width: 900px;
-            margin: auto;
-        }
+        .container { max-width: 1100px; margin: auto; }
 
-        .header {
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            color: #2563eb;
-            margin-bottom: 8px;
-        }
-
-        .header p {
-            color: #64748b;
-        }
-
-        .card {
-            background: white;
-            padding: 25px;
-            border-radius: 14px;
-            margin-bottom: 22px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-        }
+        .header { margin-bottom: 28px; }
+        .header h1 { font-size: 27px; margin-bottom: 8px; }
+        .header p { color: var(--muted); font-size: 13px; }
 
         .stats {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 20px;
         }
 
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            padding: 23px;
+            margin-bottom: 20px;
+            min-width: 0;
+            box-shadow: 0 2px 8px rgba(15,23,42,.025);
+        }
+
+        .stat-label { color: var(--muted); font-size: 13px; }
         .stat-number {
-            font-size: 36px;
+            font-size: 30px;
             font-weight: 700;
-            color: #2563eb;
+            color: var(--primary);
             margin-top: 12px;
+            overflow-wrap: anywhere;
         }
 
-        .stat-label {
-            color: #64748b;
-            font-size: 14px;
+        .last-visited {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .card h2 { font-size: 17px; margin-bottom: 7px; }
+        .chart-description {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.6;
+            margin-top: 7px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        select {
+            padding: 11px 13px;
+            border: 1px solid #dbe2ea;
+            border-radius: 8px;
+            background: white;
+            font-family: inherit;
+            font-size: 13px;
+            margin-top: 15px;
         }
 
         .url {
-            color: #2563eb;
+            color: var(--primary);
             overflow-wrap: anywhere;
             margin-top: 10px;
+            line-height: 1.7;
+            font-size: 13px;
+        }
+
+        .url a { color: inherit; font-weight: 600; }
+
+        .info-label {
+            margin-top: 20px;
+            font-weight: 600;
+            font-size: 13px;
         }
 
         .history-item {
-            padding: 18px 0;
-            border-bottom: 1px solid #e2e8f0;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             gap: 15px;
         }
 
-        .history-item:last-child {
-            border-bottom: none;
-        }
-
-        .visit-number {
-            font-weight: 600;
-        }
-
-        .timestamp {
-            color: #64748b;
-            font-size: 14px;
-        }
+        .history-item:last-child { border-bottom: none; }
+        .visit-number { font-weight: 600; font-size: 13px; }
+        .timestamp { color: var(--muted); font-size: 12px; }
+        .empty { color: #94a3b8; padding: 20px 0; font-size: 13px; }
 
         .back-btn {
             display: inline-block;
-            background: #2563eb;
+            background: var(--primary);
             color: white;
             text-decoration: none;
-            padding: 12px 20px;
+            padding: 12px 18px;
             border-radius: 8px;
-            margin-top: 15px;
+            font-size: 13px;
+            font-weight: 600;
         }
 
-        .empty {
-            color: #94a3b8;
-            padding: 20px 0;
+        @media (max-width: 700px) {
+            body { padding: 22px 14px; }
+            .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+            .card { padding: 17px; }
+            .stat-number { font-size: 25px; }
+            .last-visited { font-size: 15px; }
+            .chart-container { height: 250px; }
         }
 
-        .chart-container {
-            position: relative;
-            height: 320px;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .chart-description {
-            color: #64748b;
-            font-size: 14px;
-            margin-top: 8px;
-        }
-
-        .last-visited {
-            font-size: 22px;
-            font-weight: 700;
-            color: #2563eb;
-            margin-top: 12px;
-        }
-
-        @media(max-width: 600px) {
-            .stats {
-                grid-template-columns: 1fr;
-            }
-
-            .history-item {
-                flex-direction: column;
-            }
+        @media (max-width: 380px) {
+            .stats { grid-template-columns: 1fr; }
+            .history-item { flex-direction: column; gap: 6px; }
         }
     </style>
 </head>
 
 <body>
-
 <div class="container">
 
     <div class="header">
@@ -150,7 +157,6 @@
     </div>
 
     <div class="stats">
-
         <div class="card">
             <p class="stat-label">Total Clicks</p>
             <div class="stat-number"><%= totalClicks %></div>
@@ -158,223 +164,131 @@
 
         <div class="card">
             <p class="stat-label">Short ID</p>
-            <div class="stat-number" style="font-size: 25px;">
-                <%= url.shortId %>
-            </div>
+            <div class="stat-number"><%= url.shortId %></div>
         </div>
 
         <div class="card">
             <p class="stat-label">Last Visited</p>
-
             <div class="last-visited">
-                 <% if (url.visitHistory.length > 0) { %>
-                    <%= new Date(
-                        url.visitHistory[url.visitHistory.length - 1].timestamp
-                    ).toLocaleString() %>
-                <% } else { %> 
+                <% if (url.visitHistory.length > 0) { %>
+                    <%= new Date(url.visitHistory[url.visitHistory.length - 1].timestamp).toLocaleString() %>
+                <% } else { %>
                     Never
                 <% } %>
             </div>
         </div>
+    </div>
 
-        <div class="card">
-            <h2>Click Performance</h2>
-            <p class="chart-description" id="clickChartDescription">
-                Track how many times your shortened URL was visited over the last 7 days.
-            </p>
+    <div class="card">
+        <h2>Click Performance</h2>
+        <p class="chart-description" id="clickChartDescription">
+            Track visits over the last 7 days.
+        </p>
 
-            <select id="clickRange" style="
-                margin-top: 15px;
-                padding: 10px 14px;
-                border: 1px solid #dbe2ea;
-                border-radius: 8px;
-                background: white;
-                font-size: 13px;
-                cursor: pointer;
-            ">
-               <option value="7">Last 7 Days</option>
-               <option value="30">Last 30 Days</option>
-            </select>
+        <select id="clickRange" aria-label="Select click history range">
+            <option value="7">Last 7 Days</option>
+            <option value="30">Last 30 Days</option>
+        </select>
 
-            <div class="chart-container">
-                <canvas id="clickChart"></canvas>
-            </div>
+        <div class="chart-container">
+            <canvas id="clickChart"></canvas>
         </div>
+    </div>
 
+    <div class="stats">
         <div class="card">
             <h2>Device Breakdown</h2>
-            <p class="chart-description">
-                See which devices visitors use to open your links.
-            </p>
-
-            <div class="chart-container">
-                <canvas id="deviceChart"></canvas>
-            </div>
+            <p class="chart-description">Devices visitors use to open your links.</p>
+            <div class="chart-container"><canvas id="deviceChart"></canvas></div>
         </div>
 
         <div class="card">
             <h2>Browser Breakdown</h2>
-            <p class="chart-description">
-                Discover which browsers your visitors use,
-            </p>
-
-            <div class="chart-container">
-                <canvas id="browserChart"></canvas>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>Traffic Sources</h2>
-            <p class="chart-description">
-                Understand where your link clicks are coming from.
-            </p>
-
-            <div class="chart-container">
-                <canvas id="sourceChart"></canvas>
-            </div>
+            <p class="chart-description">Browsers visitors use to open your links.</p>
+            <div class="chart-container"><canvas id="browserChart"></canvas></div>
         </div>
     </div>
 
     <div class="card">
+        <h2>Traffic Sources</h2>
+        <p class="chart-description">Understand where your link clicks are coming from.</p>
+        <div class="chart-container"><canvas id="sourceChart"></canvas></div>
+    </div>
 
+    <div class="card">
         <h2>URL Information</h2>
 
-        <p style="margin-top: 20px; font-weight: 600;">
-            Original URL
-        </p>
-
+        <p class="info-label">Original URL</p>
         <p class="url"><%= url.redirectURL %></p>
 
-        <p style="margin-top: 20px; font-weight: 600;">
-            Shortened URL
-        </p>
-
+        <p class="info-label">Shortened URL</p>
         <p class="url">
-            <a href="/<%= url.shortId %>">
-                <%= `${typeof host !== 'undefined' ? host : 'http://localhost:8001'}/${url.shortId}` %>
+            <a href="/<%= url.shortId %>" id="shortUrl">
+                <%= url.shortId %>
             </a>
         </p>
-
     </div>
 
     <div class="card">
-
         <h2>Visit History</h2>
 
         <% if (url.visitHistory.length > 0) { %>
-
             <% url.visitHistory.slice().reverse().forEach((visit, index) => { %>
-
                 <div class="history-item">
-
-                    <span class="visit-number">
-                        Visit #<%= url.visitHistory.length - index %>
-                    </span>
-
-                    <span class="timestamp">
-                        <%= new Date(visit.timestamp).toLocaleString() %>
-                    </span>
-
+                    <span class="visit-number">Visit #<%= url.visitHistory.length - index %></span>
+                    <span class="timestamp"><%= new Date(visit.timestamp).toLocaleString() %></span>
                 </div>
-
             <% }) %>
-
         <% } else { %>
-
-            <p class="empty">
-                No visits recorded yet.
-            </p>
-
+            <p class="empty">No visits recorded yet.</p>
         <% } %>
-
     </div>
 
-    <a href="/" class="back-btn">
-        ← Back to Dashboard
-    </a>
-
+    <a href="/" class="back-btn">← Back to Dashboard</a>
 </div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
-
-// Get visit timestamps from MongoDB through EJS
-const visitHistory = <%- JSON.stringify(
-    url.visitHistory.map(visit => visit.timestamp)
-) %>;
-
-// Get analytics data calculated by the backend
+const visitHistory = <%- JSON.stringify(url.visitHistory.map(visit => visit.timestamp)) %>;
 const analytics = <%- JSON.stringify(analytics) %>;
 
-// Helper function to create chart data
+document.getElementById("shortUrl").textContent =
+    window.location.origin + "/<%= url.shortId %>";
+
 function getChartData(data) {
     const entries = Object.entries(data || {});
-
-    if (entries.length === 0) {
-        return {
-            labels: ["No data yet"],
-            values: [0]
-        };
-    }
-
+    if (!entries.length) return { labels: ["No data yet"], values: [0] };
     return {
         labels: entries.map(entry => entry[0]),
         values: entries.map(entry => entry[1])
     };
 }
 
-// Generate the last 7 days, including today
-
-// Click Performance Chart
-
-const clickRange = document.getElementById('clickRange');
-const clickDescription = document.getElementById('clickChartDescription');
-
+const clickRange = document.getElementById("clickRange");
+const clickDescription = document.getElementById("clickChartDescription");
 const labels = [];
 const clickCounts = [];
-
 const today = new Date();
 
 function generateClickChart(days) {
-
     labels.length = 0;
     clickCounts.length = 0;
 
     for (let i = days - 1; i >= 0; i--) {
-
         const date = new Date(today);
         date.setDate(today.getDate() - i);
 
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
+        const dateKey = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
 
-        const dateKey = `${year}-${month}-${day}`;
-
-        labels.push(
-            date.toLocaleDateString('en-IN', {
-                day: 'numeric',
-                month: 'short'
-            })
-        );
+        labels.push(date.toLocaleDateString("en-IN", {
+            day: "numeric", month: "short"
+        }));
 
         const count = visitHistory.filter(timestamp => {
-
             if (!timestamp) return false;
-
             const visitDate = new Date(timestamp);
-
-            const visitKey =
-                `${visitDate.getFullYear()}-${String(
-                    visitDate.getMonth() + 1
-                ).padStart(2, '0')}-${String(
-                    visitDate.getDate()
-                ).padStart(2, '0')}`;
-
+            const visitKey = `${visitDate.getFullYear()}-${String(visitDate.getMonth()+1).padStart(2,'0')}-${String(visitDate.getDate()).padStart(2,'0')}`;
             return visitKey === dateKey;
-
         }).length;
 
         clickCounts.push(count);
@@ -382,186 +296,89 @@ function generateClickChart(days) {
 
     clickChart.data.labels = labels;
     clickChart.data.datasets[0].data = clickCounts;
-
     clickChart.update();
 
     clickDescription.textContent =
-        `Track how many times your shortened URL was visited over the last ${days} days.`;
+        `Track visits over the last ${days} days.`;
 }
 
-// Create initial chart
-const ctx = document.getElementById('clickChart');
-
-const clickChart = new Chart(ctx, {
-
-    type: 'bar',
-
+const clickChart = new Chart(document.getElementById("clickChart"), {
+    type: "bar",
     data: {
         labels: [],
         datasets: [{
-            label: 'Total Clicks',
+            label: "Total Clicks",
             data: [],
-            backgroundColor: '#3b82f6',
-            borderRadius: 7,
-            barThickness: 30
-        }]
-    },
-
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-
-        plugins: {
-            legend: {
-                display: false
-            }
-        },
-
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    precision: 0
-                },
-                title: {
-                    display: true,
-                    text: 'Number of Clicks'
-                }
-            },
-
-            x: {
-                title: {
-                    display: true,
-                    text: 'Date'
-                }
-            }
-        }
-    }
-
-});
-
-// Load initial 7-day data
-generateClickChart(7);
-
-// Update chart when dropdown changes
-clickRange.addEventListener('change', function () {
-    generateClickChart(Number(this.value));
-});
-
-
-// Common chart colors
-const chartColors = [
-    '#2563eb',
-    '#10b981',
-    '#f59e0b',
-    '#8b5cf6',
-    '#ef4444',
-    '#06b6d4',
-    '#64748b'
-];
-
-// Prepare device data
-const deviceData = getChartData(analytics.devices);
-
-// Device Breakdown Chart
-new Chart(document.getElementById('deviceChart'), {
-
-    type: 'doughnut',
-
-    data: {
-        labels: deviceData.labels,
-
-        datasets: [{
-            data: deviceData.values,
-            backgroundColor: chartColors,
-            borderWidth: 0
-        }]
-    },
-
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-
-        plugins: {
-            legend: {
-                position: 'bottom'
-            }
-        }
-    }
-});
-
-// Prepare browser data
-const browserData = getChartData(analytics.browsers);
-
-// Browser Breakdown Chart
-new Chart(document.getElementById('browserChart'), {
-
-    type: 'doughnut',
-
-    data: {
-        labels: browserData.labels,
-
-        datasets: [{
-            data: browserData.values,
-            backgroundColor: chartColors,
-            borderWidth: 0
-        }]
-    },
-
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-
-        plugins: {
-            legend: {
-                position: 'bottom'
-            }
-        }
-    }
-});
-
-// Prepare traffic source data
-const sourceData = getChartData(analytics.sources);
-
-// Traffic Sources Chart
-new Chart(document.getElementById('sourceChart'), {
-
-    type: 'bar',
-
-    data: {
-        labels: sourceData.labels,
-
-        datasets: [{
-            label: 'Visits',
-            data: sourceData.values,
-            backgroundColor: '#3b82f6',
+            backgroundColor: "#2563eb",
             borderRadius: 7
         }]
     },
-
     options: {
-        indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
-
-        plugins: {
-            legend: {
-                display: false
-            }
-        },
-
+        plugins: { legend: { display: false } },
         scales: {
-            x: {
-                beginAtZero: true,
-                ticks: {
-                    precision: 0
-                }
-            }
+            y: { beginAtZero: true, ticks: { precision: 0 } }
         }
     }
 });
 
+generateClickChart(7);
+clickRange.addEventListener("change", function() {
+    generateClickChart(Number(this.value));
+});
+
+const chartColors = [
+    "#2563eb", "#10b981", "#f59e0b",
+    "#8b5cf6", "#ef4444", "#06b6d4", "#64748b"
+];
+
+function createDoughnutChart(elementId, data) {
+    const chartData = getChartData(data);
+    new Chart(document.getElementById(elementId), {
+        type: "doughnut",
+        data: {
+            labels: chartData.labels,
+            datasets: [{
+                data: chartData.values,
+                backgroundColor: chartColors,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: "bottom" } }
+        }
+    });
+}
+
+createDoughnutChart("deviceChart", analytics.devices);
+createDoughnutChart("browserChart", analytics.browsers);
+
+const sourceData = getChartData(analytics.sources);
+
+new Chart(document.getElementById("sourceChart"), {
+    type: "bar",
+    data: {
+        labels: sourceData.labels,
+        datasets: [{
+            label: "Visits",
+            data: sourceData.values,
+            backgroundColor: "#2563eb",
+            borderRadius: 7
+        }]
+    },
+    options: {
+        indexAxis: "y",
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { beginAtZero: true, ticks: { precision: 0 } }
+        }
+    }
+});
 </script>
 </body>
 </html>
-

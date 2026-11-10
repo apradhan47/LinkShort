@@ -6,12 +6,27 @@ const urlSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
+        trim: true,
+        maxlength: 50,
+        match: /^[a-zA-Z0-9_-]+$/,
     },
 
     redirectURL: {
-        type: String,
-        required: true,
-    },
+    type: String,
+    required: true,
+    trim: true,
+    validate: {
+        validator: function (value) {
+            try {
+                const parsedURL = new globalThis.URL(value);
+                return ["http:", "https:"].includes(parsedURL.protocol);
+            } catch (error) {
+                return false;
+            }
+        },
+        message: "Only valid HTTP and HTTPS URLs are allowed."
+    }
+  },
 
     visitHistory: [
         {
