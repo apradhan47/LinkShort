@@ -45,26 +45,24 @@ The application includes individual link analytics as well as an overall dashboa
 
 ```text
 LinkShort/
-│
 ├── controllers/
 │   └── url.js
-│
 ├── middlewares/
 │   └── rateLimiter.js
-│
 ├── models/
 │   └── url.js
-│
 ├── routes/
 │   ├── staticRouter.js
 │   └── url.js
-│
+├── tests/
+│   ├── url.test.js
+│   └── rateLimiter.test.js
 ├── views/
 │   ├── home.ejs
 │   ├── analytics.ejs
 │   └── qrcode.ejs
-│
 ├── .gitignore
+├── app.js
 ├── connect.js
 ├── index.js
 ├── package.json
@@ -114,6 +112,35 @@ npm start
 Open your browser and visit:
 
 `http://localhost:8001`
+
+## Automated Testing
+
+LinkShort includes automated backend tests to verify core application functionality, API routes, URL management, redirects, analytics, and rate limiting.
+
+**Testing Tools**
+
+- Jest – Test framework
+- Supertest – HTTP endpoint testing
+- MongoDB Memory Server – Isolated database testing
+
+**Test Coverage**
+
+- 46 automated tests
+- 2 test suites
+- 83.39% line coverage
+- 100% function coverage
+
+**Run Tests Locally**
+
+```bash
+# Run all tests
+npm test
+
+# Run tests with coverage report
+npm run test:coverage
+```
+
+The tests use an in-memory MongoDB database, so they do not modify your production database.
 
 ## Analytics
 
