@@ -1,215 +1,187 @@
-# LinkShort — URL Shortener & Analytics Platform
+# LinkShort — AI-Powered Link Management & Marketing Telemetry Platform
 
-A full-stack URL shortening platform built with **Node.js, Express.js, MongoDB, and EJS**. Create custom short links, manage URLs, generate QR codes, and monitor link performance through an analytics dashboard.
+A modern, production-grade link management and marketing telemetry platform built with **Node.js, Express.js, MongoDB, Google Gemini AI, and EJS**. 
 
-**Live Demo:** [LinkShort](https://linkshort-jlnb.onrender.com)  
+LinkShort elevates basic URL shortening into an enterprise attribution suite featuring **automated AI content classification, campaign UTM builders, device/referrer telemetry, JWT-based multi-tenancy, and 1-click executive CSV data reporting**.
+
+**Live Demo:** [LinkShort on Render](https://linkshort-jlnb.onrender.com)  
 **Source Code:** [GitHub Repository](https://github.com/apradhan47/LinkShort)
 
 ---
 
-## Overview
+## 🌟 Key Product Features
 
-LinkShort makes long URLs easier to share and manage. It provides a centralized dashboard where users can create shortened URLs, customize aliases, manage link expiration, generate QR codes, and track engagement.
+### 1. 🤖 Google Gemini AI Content Intelligence
+- **Automated URL Previews:** Every destination link is analyzed by Google's flagship **Gemini 3.5 Flash** model to generate a concise, 1-sentence TL;DR preview.
+- **Smart Category & Tagging:** AI extracts core topics (#Technology, #SaaS, #Fintech, #Design) and tags links to enhance click-through confidence and safety transparency before clicking.
 
-The application includes individual link analytics as well as an overall dashboard for monitoring URL performance.
+### 2. 🔐 Multi-Tenancy & Role-Based Workspaces
+- **JWT & Encrypted Passwords:** Session cookie authentication backed by `jsonwebtoken` and `bcryptjs` with salted hash encryption.
+- **Strict Data Isolation:** Regular users manage only their personal links and private metrics in dedicated workspaces.
+- **Master Admin Portal:** Built-in administrative privilege tier (`Aayush 27`) with global system visibility, cross-user link oversight, and global telemetry export.
+- **Robust Field Validation:** Enforces space-free unique usernames, RFC-compliant email verification, and a real-time password requirement checklist (Uppercase, Lowercase, Number, Special Character, 8+ characters).
 
-## Application Screenshots
+### 3. 📊 Marketing Attribution & UTM Campaign Builder
+- **Built-in UTM Builder:** Marketing teams can directly inject `utm_source`, `utm_medium`, and `utm_campaign` parameters with live URL previews.
+- **Interactive Telemetry Modal:** Instant in-dashboard attribution breakdown showing:
+  - 📱 **Device Distribution** (Mobile, Desktop, Tablet splits)
+  - 🌐 **Top Referrers** (Direct, LinkedIn, Twitter, Google, etc.)
+  - 🧭 **Browser Telemetry** (Chrome, Safari, Edge, Firefox)
+- **1-Click Executive CSV Export:** Generates RFC 4180-compliant CSV reports with click statistics, AI summaries, and lifecycle timestamps for stakeholder presentations.
 
-### Dashboard Overview
+### 4. 🎨 Next-Gen Glassmorphic Dark UI
+- Designed with an atmospheric obsidian aesthetic (`#090d16`), animated ambient radial glows, and frosted glass cards (`backdrop-filter: blur(20px)`).
+- **Interactive Timed Hero Carousel:** Auto-advancing feature presentation with progress tracking bars, Oswald typography, and pause-on-hover controls.
+- **Inline Action Controls:** Streamlined quick-action pills for instant link copying, status pausing, expiration management, and QR previews.
 
-View overall link performance, total clicks, active links, disabled links, and expired links.
+### 5. 🛡️ Reliability & Security
+- **Dynamic QR Codes:** Real-time QR generation and high-resolution PNG download.
+- **Scheduled Expiration:** Set link TTL (1, 7, 30, 90 days or custom calendar dates) with automatic traffic rerouting on expiration.
+- **Brute-Force & Rate Limiting:** Endpoint protection via `express-rate-limit` to defend against abusive link generation and redirection storms.
+- **83.4% Code Coverage:** **46 automated test suites** written with Jest and Supertest.
 
-![Dashboard Overview](screenshots/dashboard.png)
+---
 
-### Link Generation
+## 💻 Tech Stack
 
-Create shortened URLs with custom aliases and configurable expiration settings.
+| Category | Technologies |
+| :--- | :--- |
+| **Artificial Intelligence** | Google Gemini API (`@google/genai` - Gemini 3.5 Flash) |
+| **Backend Architecture** | Node.js (v22), Express.js 5.x |
+| **Database & ODM** | MongoDB Atlas, Mongoose 8.x |
+| **Authentication & Security** | JWT (`jsonwebtoken`), `bcryptjs`, `cookie-parser`, `express-rate-limit` |
+| **Frontend & UI** | EJS Templating, Vanilla JavaScript, CSS Glassmorphism, Boxicons, Oswald/Inter fonts |
+| **Data Visualizations** | Chart.js |
+| **Utilities** | QRCode, ShortID, Dotenv |
+| **Testing & QA** | Jest, Supertest, MongoDB Memory Server (**46 passing tests**) |
+| **Hosting & CI/CD** | Render (Production Auto-Deploy via GitHub) |
 
-![Link Generation](screenshots/link-generation.png)
+---
 
-### URL Management
+## 🏛️ System Architecture
 
-Search, sort, edit, copy, activate, deactivate, and delete shortened URLs.
+```text
+[ Client Request ]
+       │
+       ▼
+[ Express Router ] ── (Rate Limiting & JWT Auth Middleware)
+       │
+       ├─► [ Static Controller ] ── (Renders Glassmorphic Auth & Dark Dashboard)
+       │
+       ├─► [ URL Controller ]
+       │        ├─► [ Google Gemini AI Service ] ── (Generates Summary & Tags)
+       │        ├─► [ MongoDB Atlas (URL + User Models) ]
+       │        └─► [ CSV Telemetry Pipeline ]
+       │
+       └─► [ Redirection Engine ] ── (Records User-Agent, Device, Country & Referrer)
+```
 
-![URL Management](screenshots/url-management.png)
+---
 
-### Analytics Dashboard
-
-Monitor click performance and analyze individual URL engagement.
-
-![Click Performance](screenshots/click-performance.png)
-
-![URL Analytics](screenshots/url-analytics.png)
-
-### QR Code Generation
-
-Generate, view, and download QR codes for shortened URLs.
-
-![QR Codes](screenshots/qr-codes.png)
-
-## Features
-
-- **URL Shortening:** Convert long URLs into short, shareable links.
-- **Custom Aliases:** Create personalized short URLs.
-- **Link Management:** View, edit, activate, deactivate, and delete shortened URLs.
-- **Click Tracking:** Record and monitor visits to shortened links.
-- **Analytics Dashboard:** View total links, clicks, active links, disabled links, and expired links.
-- **Individual Link Analytics:** Track click activity over 7-day and 30-day periods.
-- **Traffic Insights:** Visualize device, browser, and referrer statistics.
-- **QR Code Generation:** Generate, view, and download QR codes for shortened links.
-- **Link Expiration:** Set predefined expiration periods or choose a custom expiry date.
-- **Search and Sorting:** Find links and organize them by creation date, clicks, or alphabetical order.
-- **Input Validation:** Validate destination URLs and custom aliases.
-- **Rate Limiting:** Protect URL creation and redirection endpoints against excessive requests.
-
-## Tech Stack
-
-| Category            | Technologies               |
-| ------------------- | -------------------------- |
-| Backend             | Node.js, Express.js        |
-| Frontend            | EJS, HTML, CSS, JavaScript |
-| Database            | MongoDB, Mongoose          |
-| Charts              | Chart.js                   |
-| QR Codes            | qrcode                     |
-| Short ID Generation | shortid                    |
-| Security            | express-rate-limit         |
-| Deployment          | Render                     |
-
-## Project Structure
+## 📁 Project Structure
 
 ```text
 LinkShort/
 ├── controllers/
-│   └── url.js
+│   ├── url.js             # Shortening, telemetry, CSV export, QR & editing
+│   └── user.js            # User signup, login, validation, and admin auth
 ├── middlewares/
-│   └── rateLimiter.js
+│   ├── auth.js            # JWT verification & multi-tenant route protection
+│   └── rateLimiter.js     # IP rate limiters for creation & redirects
 ├── models/
-│   └── url.js
+│   ├── url.js             # URL schema with AI metadata & visit history
+│   └── user.js            # User schema with hashed passwords & roles
 ├── routes/
-│   ├── staticRouter.js
-│   └── url.js
-├── screenshots/
-│   ├── dashboard.png
-│   ├── link-generation.png
-│   ├── url-management.png
-│   ├── click-performance.png
-│   ├── url-analytics.png
-│   └── qr-codes.png
+│   ├── staticRouter.js    # Dashboard, auth gateway, and analytics views
+│   ├── url.js             # API & form endpoints for URL operations
+│   └── user.js            # Authentication routes (/login, /signup, /logout)
+├── services/
+│   ├── aiService.js       # Gemini 3.5 Flash integration & JSON parser
+│   └── auth.js            # JWT signing & token decode logic
 ├── tests/
-│   ├── url.test.js
-│   └── rateLimiter.test.js
+│   ├── rateLimiter.test.js # Security & rate-limiting test suites
+│   └── url.test.js        # End-to-end integration tests (46 total)
 ├── views/
-│   ├── home.ejs
-│   ├── analytics.ejs
-│   └── qrcode.ejs
-├── .gitignore
-├── app.js
-├── connect.js
-├── index.js
-├── package.json
-├── package-lock.json
-└── README.md
+│   ├── analytics.ejs      # Deep-dive individual link analytics
+│   ├── auth.ejs           # Timed carousel hero & segmented login/signup
+│   ├── home.ejs           # Dark glassmorphic workspace dashboard
+│   └── qrcode.ejs         # Standalone QR code view & download
+├── app.js                 # Express application configuration
+├── index.js               # Server bootstrap & MongoDB connection
+└── package.json           # Project manifest & dependencies
 ```
-
-## Getting Started
-
-Follow these instructions to run LinkShort locally.
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/apradhan47/LinkShort.git
-```
-
-### 2. Navigate to the project directory
-
-```bash
-cd LinkShort
-```
-
-### 3. Install dependencies
-
-```bash
-npm install
-```
-
-### 4. Configure environment variables
-
-Create a `.env` file in the root directory and add:
-
-```env
-MONGODB_URI=your_mongodb_connection_string
-BASE_URL=http://localhost:8001
-```
-
-Replace the MongoDB placeholder with your own MongoDB connection string.
-
-### 5. Start the application
-
-```bash
-npm start
-```
-
-Open your browser and visit:
-
-`http://localhost:8001`
-
-## Automated Testing
-
-LinkShort includes automated backend tests to verify core application functionality, API routes, URL management, redirects, analytics, and rate limiting.
-
-**Testing Tools**
-
-- Jest – Test framework
-- Supertest – HTTP endpoint testing
-- MongoDB Memory Server – Isolated database testing
-
-**Test Coverage**
-
-- 46 automated tests
-- 2 test suites
-- 83.39% line coverage
-- 100% function coverage
-
-**Run Tests Locally**
-
-```bash
-# Run all tests
-npm test
-
-# Run tests with coverage report
-npm run test:coverage
-```
-
-The tests use an in-memory MongoDB database, so they do not modify your production database.
-
-## Analytics
-
-LinkShort provides two levels of analytics:
-
-- **Dashboard Analytics:** Overall link and click performance.
-- **Individual Link Analytics:** Click history, device distribution, browser statistics, and traffic sources for each shortened URL.
-
-## Deployment
-
-The application is deployed on Render and uses MongoDB Atlas for persistent data storage.
-
-**Live Application:** [https://linkshort-jlnb.onrender.com](https://linkshort-jlnb.onrender.com)
-
-## Future Improvements
-
-- Geographic analytics for visitor locations.
-- User authentication and personalized dashboards.
-- Link access protection.
-- More detailed analytics and reporting.
-- Improved link management and sharing capabilities.
-
-## Author
-
-**Aayush Pradhan**
-
-- GitHub: [@apradhan47](https://github.com/apradhan47)
 
 ---
 
-_Built as a full-stack web development project to explore backend development, database integration, URL management, analytics, and deployment._
+## 🚀 Getting Started Locally
+
+### 1. Prerequisites
+- Node.js (v18 or higher)
+- MongoDB instance (Local or MongoDB Atlas connection string)
+- Google Gemini API Key (Available free via [Google AI Studio](https://aistudio.google.com/))
+
+### 2. Installation & Setup
+```bash
+# Clone the repository
+git clone https://github.com/apradhan47/LinkShort.git
+cd LinkShort
+
+# Install dependencies
+npm install
+
+# Create environment configuration
+cp .env.example .env
+```
+
+### 3. Environment Variables (`.env`)
+```env
+PORT=8000
+MONGODB_URI=your_mongodb_connection_string
+GEMINI_API_KEY=your_google_gemini_api_key
+JWT_SECRET=your_super_secret_jwt_key
+BASE_URL=http://localhost:8000
+```
+
+### 4. Running the Application
+```bash
+# Start in production mode
+npm start
+
+# Or start with nodemon for development
+npm run dev
+```
+Open **`http://localhost:8000`** in your browser.
+
+---
+
+## 🧪 Testing & Code Quality
+
+The platform includes comprehensive test suites covering URL creation, expiration boundaries, rate limiting, and dashboard rendering.
+
+```bash
+# Run all test suites
+npm test
+
+# Run tests with detailed code coverage report
+npm run test:coverage
+```
+
+**Test Results:**
+- **Test Suites:** 2 passed, 2 total
+- **Tests:** 46 passed, 46 total
+- **Function Coverage:** 100%
+- **Line Coverage:** 83.4%
+
+---
+
+## 👨‍💻 Author
+
+**Aayush Pradhan**
+- LinkedIn: [linkedin.com/in/aayushpradhan02](https://www.linkedin.com/in/aayushpradhan02/)
+- Portfolio / GitHub: [github.com/apradhan47](https://github.com/apradhan47)
+- Email: aayushreq02@gmail.com
+
+---
+
+## 📄 License
+This project is open-source under the [ISC License](LICENSE).
