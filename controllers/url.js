@@ -1,6 +1,7 @@
 const QRCode = require("qrcode");
 const shortid = require("shortid");
 const URL = require("../models/url");
+const { analyzeURLContent } = require("../services/aiService");
 
 
 async function handleGenerateNewShortURL(req, res) {
@@ -89,6 +90,8 @@ async function handleGenerateNewShortURL(req, res) {
             }
             expiresAt = selectedDate;
         }
+                // Generate AI insights asynchronously
+        const aiMetadata = await analyzeURLContent(body.url);
 
         // Save URL in MongoDB
         await URL.create({
@@ -96,6 +99,7 @@ async function handleGenerateNewShortURL(req, res) {
             redirectURL: parsedURL.href,
             visitHistory: [],
             expiresAt: expiresAt,
+            aiMetadata: aiMetadata,
         });
 
        return res.redirect(`/?created=${encodeURIComponent(shortID)}`);

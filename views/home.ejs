@@ -1288,6 +1288,21 @@
                                             title="<%= url.redirectURL %>">
                                             <%= url.redirectURL %>
                                         </span>
+                                        <% if (url.aiMetadata && url.aiMetadata.summary) { %>
+                                            <div style="margin-top: 5px; font-size: 11px; color: #475569; background: #f8fafc; padding: 4px 8px; border-radius: 4px; border-left: 3px solid #6366f1;">
+                                                <span>✨ <%= url.aiMetadata.summary %></span>
+                                                <div style="margin-top: 3px; display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                                                    <span style="background: #e0e7ff; color: #3730a3; padding: 1px 5px; border-radius: 3px; font-size: 10px; font-weight: 600;">
+                                                        <%= url.aiMetadata.category %>
+                                                    </span>
+                                                    <% (url.aiMetadata.tags || []).forEach(function(tag) { %>
+                                                        <span style="background: #e2e8f0; color: #334155; padding: 1px 4px; border-radius: 3px; font-size: 9px;">
+                                                            #<%= tag %>
+                                                        </span>
+                                                    <% }); %>
+                                                </div>
+                                            </div>
+                                        <% } %>
                                     </td>
 
                                     <td>

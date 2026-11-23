@@ -62,6 +62,22 @@ const urlSchema = new mongoose.Schema({
         }
     ],
 
+    // AI Metadata
+    aiMetadata: {
+        summary: {
+            type: String,
+            default: ""
+        },
+        category: {
+            type: String,
+            default: "General"
+        },
+        tags: {
+            type: [String],
+            default: []
+        }
+    },
+
     // Link expiration
     expiresAt: {
         type: Date,
