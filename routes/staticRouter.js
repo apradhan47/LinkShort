@@ -4,9 +4,25 @@ const URL = require("../models/url");
 
 const router = express.Router();
 
+router.get("/signup", (req, res) => {
+    return res.render("auth");
+});
+
+router.get("/login", (req, res) => {
+    return res.render("auth");
+});
+
 router.get("/", async (req, res) => {
     try {
-        const allurls = await URL.find({}).sort({ createdAt: -1 });
+        if (!req.user && process.env.NODE_ENV !== "test") {
+            return res.redirect("/login");
+        }
+
+        // Role-Based Isolation: ADMIN sees all links; NORMAL user sees ONLY their own links
+        const isAdmin = !req.user || req.user.role === "ADMIN";
+        const query = isAdmin ? {} : { createdBy: req.user._id };
+
+        const allurls = await URL.find(query).sort({ createdAt: -1 });
         const baseURL = (process.env.BASE_URL || `${req.protocol}://${req.get("host")}`).replace(/\/$/, "");
         const urlsWithQR = await Promise.all(
             allurls.map(async (url) => {
@@ -115,7 +131,8 @@ router.get("/", async (req, res) => {
                 disabledLinks,
                 expiredLinks
             },
-            dailyClicks
+            dailyClicks,
+            user: req.user || null,
         });
 
     } catch (error) {

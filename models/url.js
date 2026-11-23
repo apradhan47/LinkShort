@@ -89,6 +89,11 @@ const urlSchema = new mongoose.Schema({
         default: true,
     },
 
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+    },
+
 },
 { timestamps: true });
 

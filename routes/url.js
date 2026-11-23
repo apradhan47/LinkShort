@@ -9,7 +9,8 @@ const {
     handleGenerateQRCode,
     handleEditURL,
     handleEditExpiration,
-    handleToggleURLStatus
+    handleToggleURLStatus,
+    handleExportCSV
 } = require('../controllers/url');
 
 const router = express.Router();
@@ -27,6 +28,9 @@ router.post('/delete/:shortId', handleDeleteURL);
 
 // Activate / Deactivate link
 router.post('/toggle/:shortId', handleToggleURLStatus);
+
+// Export all analytics to CSV
+router.get('/export/csv', handleExportCSV);
 
 // QR Code generation
 router.get('/qrcode/:shortId', handleGenerateQRCode);

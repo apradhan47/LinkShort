@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkShort | Next-Gen Link Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            --accent: #38bdf8;
+            --bg-dark: #090d16;
+            --card-border: rgba(255, 255, 255, 0.12);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient animated glow background */
+        .ambient-glow {
+            position: fixed;
+            top: -20%;
+            left: -10%;
+            width: 70vw;
+            height: 70vw;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(124, 58, 237, 0.05) 50%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+            animation: pulseGlow 14s ease-in-out infinite alternate;
+        }
+
+        .ambient-glow-2 {
+            position: fixed;
+            bottom: -20%;
+            right: -10%;
+            width: 65vw;
+            height: 65vw;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(99, 102, 241, 0.04) 50%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(90px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.15) translate(40px, 30px); }
+        }
+
+        /* Modern Glass Navbar */
+        nav {
+            position: relative;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 60px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .brand-text {
+            font-size: 22px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-text span {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-btn-secondary {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 10px 18px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn-secondary:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-btn-primary {
+            background: var(--primary-gradient);
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 10px 22px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-btn-primary:hover {
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.55);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Container */
+        .hero-layout {
+            position: relative;
+            z-index: 10;
+            max-width: 1380px;
+            margin: 0 auto;
+            padding: 40px 60px 80px;
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 50px;
+            align-items: center;
+            min-height: calc(100vh - 90px);
+        }
+
+        /* Left Side: Product Showcase & Interactive Timed Carousel */
+        .showcase-container {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 30px;
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #a5b4fc;
+            width: fit-content;
+        }
+
+        .hero-badge i {
+            color: var(--accent);
+        }
+
+        .hero-heading {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -1.2px;
+        }
+
+        .hero-heading span {
+            background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Timed Cards Slider Showcase */
+        .carousel-box {
+            position: relative;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 30px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .carousel-progress-track {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 99px;
+            margin-bottom: 24px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .carousel-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--primary-gradient);
+            border-radius: 99px;
+            transition: width 0.1s linear;
+        }
+
+        .slider-content-wrap {
+            min-height: 170px;
+            position: relative;
+        }
+
+        .slide-item {
+            display: none;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide-item.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide-tag {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .slide-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .slide-description {
+            font-size: 14.5px;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        /* Carousel Navigation controls */
+        .slider-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .slide-indicator-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            width: 24px;
+            border-radius: 12px;
+            background: var(--primary);
+        }
+
+        .nav-arrows {
+            display: flex;
+            gap: 10px;
+        }
+
+        .arrow-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .arrow-btn:hover {
+            background: rgba(99, 102, 241, 0.25);
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        /* Right Side: Glassmorphism Auth Card */
+        .auth-glass-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            padding: 40px 36px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(99, 102, 241, 0.1);
+            position: relative;
+        }
+
+        .auth-glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.8), transparent);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .auth-header h3 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+            margin-bottom: 6px;
+        }
+
+        .auth-header p {
+            font-size: 13.5px;
+            color: #94a3b8;
+        }
+
+        /* Segmented Tab Switch */
+        .tab-segmented {
+            display: flex;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 24px;
+        }
+
+        .tab-switch-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            font-family: inherit;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 9px;
+            transition: all 0.25s ease;
+        }
+
+        .tab-switch-btn.active {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 13px 15px;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .input-group input::placeholder {
+            color: #64748b;
+        }
+
+        .error-chip {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+
+        .submit-auth-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-gradient);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 14.5px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+            transition: all 0.25s ease;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .submit-auth-btn:hover {
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.55);
+            transform: translateY(-2px);
+        }
+
+        .password-checklist {
+            margin-top: 8px;
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 3px;
+            transition: color 0.2s ease;
+        }
+
+        .admin-badge-footer {
+            margin-top: 22px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px dashed rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            font-size: 12px;
+            color: #94a3b8;
+            text-align: center;
+        }
+
+        .admin-badge-footer code {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-layout {
+                grid-template-columns: 1fr;
+                padding: 30px 24px;
+                gap: 40px;
+            }
+            nav {
+                padding: 20px 24px;
+            }
+            .hero-heading {
+                font-size: 38px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow"></div>
+    <div class="ambient-glow-2"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="/" class="nav-brand">
+            <div class="brand-icon">
+                <i class='bx bx-link-alt' style="font-size: 22px; color: white;"></i>
+            </div>
+            <div class="brand-text">Link<span>Short.</span></div>
+        </a>
+
+        <div class="nav-actions">
+            <a href="https://github.com/apradhan47/LinkShort" target="_blank" class="nav-btn-secondary">
+                <i class='bx bxl-github' style="font-size: 18px; vertical-align: middle;"></i> GitHub
+            </a>
+            <a href="#auth-box" class="nav-btn-primary" onclick="focusAuth('signup')">
+                Get Started <i class='bx bx-right-arrow-alt'></i>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Hero -->
+    <main class="hero-layout">
+
+        <!-- Left Column: Timed Feature Carousel -->
+        <section class="showcase-container">
+            <div class="hero-badge">
+                <i class='bx bxs-zap'></i> Powered by Google Gemini AI & Live Telemetry
+            </div>
+
+            <h1 class="hero-heading">
+                Smart links designed for <span>growth & deep attribution.</span>
+            </h1>
+
+            <!-- Timed Interactive Card Carousel -->
+            <div class="carousel-box">
+                <div class="carousel-progress-track">
+                    <div id="carouselProgressBar" class="carousel-progress-bar"></div>
+                </div>
+
+                <div class="slider-content-wrap">
+                    <!-- Slide 1 -->
+                    <div class="slide-item active" data-index="0">
+                        <div class="slide-tag">
+                            <i class='bx bx-brain'></i> Feature 01 / Intelligence
+                        </div>
+                        <div class="slide-title">GEMINI AI LINK SUMMARIES</div>
+                        <p class="slide-description">
+                            Every shortened URL is automatically scanned by Gemini 3.5 Flash to generate instant 1-sentence previews, topic tags (#Fintech, #Design, #SaaS), and safety classification before you even click.
+                        </p>
+                    </div>
+
+                    <!-- Slide 2 -->
+                    <div class="slide-item" data-index="1">
+                        <div class="slide-tag">
+                            <i class='bx bx-radar'></i> Feature 02 / Telemetry
+                        </div>
+                        <div class="slide-title">CAMPAIGN UTM & ATTRIBUTION</div>
+                        <p class="slide-description">
+                            Built-in UTM parameter builder for marketing campaigns with real-time breakdowns of device distribution (Mobile vs. Desktop), top referral channels, and browser telemetry.
+                        </p>
+                    </div>
+
+                    <!-- Slide 3 -->
+                    <div class="slide-item" data-index="2">
+                        <div class="slide-tag">
+                            <i class='bx bx-shield-quarter'></i> Feature 03 / Multi-Tenancy
+                        </div>
+                        <div class="slide-title">ROLE-BASED WORKSPACES</div>
+                        <p class="slide-description">
+                            Enterprise-grade role-based isolation. Normal users operate in private workspaces with their own links, while Master Admins maintain centralized visibility and CSV export capabilities.
+                        </p>
+                    </div>
+
+                    <!-- Slide 4 -->
+                    <div class="slide-item" data-index="3">
+                        <div class="slide-tag">
+                            <i class='bx bx-qr-scan'></i> Feature 04 / Utilities
+                        </div>
+                        <div class="slide-title">DYNAMIC QR & EXPIRATION</div>
+                        <p class="slide-description">
+                            Auto-generated high-resolution QR codes, scheduled lifecycle expiration (1 day to 90 days), and one-click link pausing to give you complete governance over your links.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Carousel Controls -->
+                <div class="slider-footer">
+                    <div class="slide-indicator-dots">
+                        <span class="dot active" onclick="goToSlide(0)"></span>
+                        <span class="dot" onclick="goToSlide(1)"></span>
+                        <span class="dot" onclick="goToSlide(2)"></span>
+                        <span class="dot" onclick="goToSlide(3)"></span>
+                    </div>
+
+                    <div class="nav-arrows">
+                        <button class="arrow-btn" onclick="prevSlide()" title="Previous slide">
+                            <i class='bx bx-chevron-left' style="font-size: 20px;"></i>
+                        </button>
+                        <button class="arrow-btn" onclick="nextSlide()" title="Next slide">
+                            <i class='bx bx-chevron-right' style="font-size: 20px;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Column: Glassmorphism Auth Card -->
+        <section id="auth-box" class="auth-glass-card">
+            <div class="auth-header">
+                <h3 id="authTitle">Welcome to LinkShort</h3>
+                <p id="authSubtitle">Sign in or create your dedicated workspace</p>
+            </div>
+
+            <% if (locals.error) { %>
+                <div class="error-chip"><%= error %></div>
+            <% } %>
+
+            <div class="tab-segmented">
+                <button type="button" id="tabLogin" class="tab-switch-btn active" onclick="switchTab('login')">Sign In</button>
+                <button type="button" id="tabSignup" class="tab-switch-btn" onclick="switchTab('signup')">Create Account</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="formLogin" action="/user/login" method="POST">
+                <div class="input-group">
+                    <label for="loginIdentifier">Email or Username</label>
+                    <input type="text" id="loginIdentifier" name="email" placeholder="name@company.com or Aayush 27" required>
+                </div>
+                <div class="input-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" name="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="submit-auth-btn">
+                    Access Workspace <i class='bx bx-right-arrow-alt'></i>
+                </button>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="formSignup" action="/user/signup" method="POST" style="display: none;" onsubmit="return validateClientForm();">
+                <div class="input-group">
+                    <label for="signupUsername">Unique Username</label>
+                    <input 
+                        type="text" 
+                        id="signupUsername" 
+                        name="username" 
+                        placeholder="aayush_dev" 
+                        oninput="this.value = this.value.replace(/\s/g, '')"
+                    >
+                    <small style="font-size: 11px; color: #64748b; margin-top: 3px; display: block;">No spaces allowed.</small>
+                </div>
+                <div class="input-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" name="name" placeholder="Aayush Pradhan">
+                </div>
+                <div class="input-group">
+                    <label for="signupEmail">Email Address</label>
+                    <input type="email" id="signupEmail" name="email" placeholder="name@company.com">
+                </div>
+                <div class="input-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" name="password" placeholder="Min 8 characters">
+                    
+                    <div class="password-checklist">
+                        <div style="font-weight: 700; color: #cbd5e1; margin-bottom: 4px;">Password requirements:</div>
+                        <div id="vUpper" class="checklist-item"><i class='bx bx-check-circle'></i> Uppercase letter (A-Z)</div>
+                        <div id="vLower" class="checklist-item"><i class='bx bx-check-circle'></i> Lowercase letter (a-z)</div>
+                        <div id="vNumber" class="checklist-item"><i class='bx bx-check-circle'></i> At least one number (0-9)</div>
+                        <div id="vSpecial" class="checklist-item"><i class='bx bx-check-circle'></i> Special character (!@#$%^&*)</div>
+                        <div id="vLength" class="checklist-item"><i class='bx bx-check-circle'></i> 8+ characters</div>
+                    </div>
+                </div>
+                <button type="submit" class="submit-auth-btn">
+                    Create Workspace <i class='bx bx-user-plus'></i>
+                </button>
+            </form>
+
+            <div class="admin-badge-footer">
+                Master Admin access available: <code>Aayush 27</code>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Interactive Carousel Script -->
+    <script>
+        const slides = document.querySelectorAll(".slide-item");
+        const dots = document.querySelectorAll(".dot");
+        const progressBar = document.getElementById("carouselProgressBar");
+        
+        let currentSlide = 0;
+        const totalSlides = slides.length;
+        const slideDuration = 4500; // 4.5 seconds per slide
+        let slideStartTime = Date.now();
+        let animationFrameId;
+
+        function updateSlideUI(index) {
+            slides.forEach((s, i) => {
+                s.classList.toggle("active", i === index);
+            });
+            dots.forEach((d, i) => {
+                d.classList.toggle("active", i === index);
+            });
+            slideStartTime = Date.now();
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateSlideUI(currentSlide);
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            updateSlideUI(currentSlide);
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSlideUI(currentSlide);
+        }
+
+        // Smooth timed progress loop
+        function tickProgress() {
+            const elapsed = Date.now() - slideStartTime;
+            const progressPercent = Math.min((elapsed / slideDuration) * 100, 100);
+            progressBar.style.width = progressPercent + "%";
+
+            if (elapsed >= slideDuration) {
+                nextSlide();
+            }
+            animationFrameId = requestAnimationFrame(tickProgress);
+        }
+
+        animationFrameId = requestAnimationFrame(tickProgress);
+
+        // Pause on hover
+        const carouselBox = document.querySelector(".carousel-box");
+        carouselBox.addEventListener("mouseenter", () => {
+            cancelAnimationFrame(animationFrameId);
+        });
+        carouselBox.addEventListener("mouseleave", () => {
+            slideStartTime = Date.now();
+            animationFrameId = requestAnimationFrame(tickProgress);
+        });
+
+        // Tab Switching Logic
+        function switchTab(mode) {
+            const formLogin = document.getElementById("formLogin");
+            const formSignup = document.getElementById("formSignup");
+            const tabLogin = document.getElementById("tabLogin");
+            const tabSignup = document.getElementById("tabSignup");
+            const title = document.getElementById("authTitle");
+            const subtitle = document.getElementById("authSubtitle");
+
+            if (mode === "signup") {
+                formLogin.style.display = "none";
+                formSignup.style.display = "block";
+                tabSignup.classList.add("active");
+                tabLogin.classList.remove("active");
+                title.textContent = "Create Workspace";
+                subtitle.textContent = "Start tracking your links with AI intelligence";
+
+                document.getElementById("signupUsername").required = true;
+                document.getElementById("signupEmail").required = true;
+                document.getElementById("signupPassword").required = true;
+                document.getElementById("loginIdentifier").required = false;
+                document.getElementById("loginPassword").required = false;
+            } else {
+                formLogin.style.display = "block";
+                formSignup.style.display = "none";
+                tabLogin.classList.add("active");
+                tabSignup.classList.remove("active");
+                title.textContent = "Welcome Back";
+                subtitle.textContent = "Sign in to manage your workspace";
+
+                document.getElementById("loginIdentifier").required = true;
+                document.getElementById("loginPassword").required = true;
+                document.getElementById("signupUsername").required = false;
+                document.getElementById("signupEmail").required = false;
+                document.getElementById("signupPassword").required = false;
+            }
+        }
+
+        function focusAuth(mode) {
+            switchTab(mode);
+            document.getElementById("auth-box").scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Live Password Checklist
+        const pwdInput = document.getElementById("signupPassword");
+        if (pwdInput) {
+            pwdInput.addEventListener("input", function() {
+                const val = this.value;
+                setRequirementStatus("vUpper", /[A-Z]/.test(val));
+                setRequirementStatus("vLower", /[a-z]/.test(val));
+                setRequirementStatus("vNumber", /[0-9]/.test(val));
+                setRequirementStatus("vSpecial", /[!@#$%^&*(),.?":{}|<>_\-+=[\]\\/`~]/.test(val));
+                setRequirementStatus("vLength", val.length >= 8);
+            });
+        }
+
+        function setRequirementStatus(id, met) {
+            const item = document.getElementById(id);
+            if (!item) return;
+            if (met) {
+                item.style.color = "#34d399";
+                item.querySelector("i").className = "bx bxs-check-circle";
+            } else {
+                item.style.color = "#94a3b8";
+                item.querySelector("i").className = "bx bx-check-circle";
+            }
+        }
+
+        function validateClientForm() {
+            const u = document.getElementById("signupUsername").value.trim();
+            const e = document.getElementById("signupEmail").value.trim();
+            const p = document.getElementById("signupPassword").value;
+
+            if (/\s/.test(u)) {
+                alert("Username must not contain any spaces.");
+                return false;
+            }
+
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailRegex.test(e)) {
+                alert("Please enter a valid email address with an '@' symbol and a valid domain.");
+                return false;
+            }
+
+            const hasUpper = /[A-Z]/.test(p);
+            const hasLower = /[a-z]/.test(p);
+            const hasNum = /[0-9]/.test(p);
+            const hasSpec = /[!@#$%^&*(),.?":{}|<>_\-+=[\]\\/`~]/.test(p);
+
+            if (!hasUpper || !hasLower || !hasNum || !hasSpec || p.length < 8) {
+                alert("Not a valid password! It must contain at least 8 characters with an uppercase letter, a lowercase letter, a number, and a special character.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</body>
+</html>

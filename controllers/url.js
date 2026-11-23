@@ -100,6 +100,7 @@ async function handleGenerateNewShortURL(req, res) {
             visitHistory: [],
             expiresAt: expiresAt,
             aiMetadata: aiMetadata,
+            createdBy: req.user ? req.user._id : null,
         });
 
        return res.redirect(`/?created=${encodeURIComponent(shortID)}`);
@@ -165,6 +166,20 @@ async function handleGetAnalytics(req, res) {
         });
         
         const baseURL = (process.env.BASE_URL || `${req.protocol}://${req.get("host")}`).replace(/\/$/, "");
+
+        if (req.xhr || req.headers.accept?.includes("application/json") || req.query.format === "json") {
+            return res.json({
+                shortId: result.shortId,
+                redirectURL: result.redirectURL,
+                totalClicks: visits.length,
+                analytics: {
+                    devices: deviceStats,
+                    browsers: browserStats,
+                    sources: sourceStats
+                }
+            });
+        }
+
         return res.render("analytics", {
             url: result,
             baseURL,
@@ -381,6 +396,62 @@ async function handleToggleURLStatus(req, res) {
     }
 }
 
+// Export Analytics & Links to CSV
+async function handleExportCSV(req, res) {
+    try {
+        const isAdmin = req.user?.role === "ADMIN";
+        const query = isAdmin ? {} : (req.user ? { createdBy: req.user._id } : {});
+        const allUrls = await URL.find(query).sort({ createdAt: -1 });
+
+        const headers = [
+            "Short ID",
+            "Original URL",
+            "Total Clicks",
+            "Category",
+            "AI Summary",
+            "Tags",
+            "Status",
+            "Expires At",
+            "Created At"
+        ];
+
+        const escapeCSV = (val) => {
+            if (val === null || val === undefined) return '""';
+            const str = String(val).replace(/"/g, '""');
+            return `"${str}"`;
+        };
+
+        const rows = allUrls.map((u) => {
+            const isExpired = u.expiresAt && new Date(u.expiresAt) <= new Date();
+            const status = isExpired ? "Expired" : u.isActive ? "Active" : "Disabled";
+            const tags = (u.aiMetadata && u.aiMetadata.tags) ? u.aiMetadata.tags.join("; ") : "";
+            const summary = (u.aiMetadata && u.aiMetadata.summary) ? u.aiMetadata.summary : "";
+            const category = (u.aiMetadata && u.aiMetadata.category) ? u.aiMetadata.category : "General";
+
+            return [
+                escapeCSV(u.shortId),
+                escapeCSV(u.redirectURL),
+                escapeCSV(u.visitHistory ? u.visitHistory.length : 0),
+                escapeCSV(category),
+                escapeCSV(summary),
+                escapeCSV(tags),
+                escapeCSV(status),
+                escapeCSV(u.expiresAt ? new Date(u.expiresAt).toISOString() : "Never"),
+                escapeCSV(u.createdAt ? new Date(u.createdAt).toISOString() : "")
+            ].join(",");
+        });
+
+        const csvContent = [headers.join(","), ...rows].join("\r\n");
+
+        res.setHeader("Content-Type", "text/csv; charset=utf-8");
+        res.setHeader("Content-Disposition", 'attachment; filename="linkshort-analytics-export.csv"');
+        return res.status(200).send(csvContent);
+    } catch (error) {
+        console.error("CSV Export error:", error);
+        return res.status(500).send("Unable to export CSV");
+    }
+}
+
 module.exports = {
     handleGenerateNewShortURL,
     handleGetAnalytics,
@@ -389,4 +460,5 @@ module.exports = {
     handleEditURL,
     handleEditExpiration,
     handleToggleURLStatus,
+    handleExportCSV,
 };
