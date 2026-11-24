@@ -167,10 +167,10 @@ npm run test:coverage
 ```
 
 **Test Results:**
-- **Test Suites:** 2 passed, 2 total
-- **Tests:** 46 passed, 46 total
-- **Function Coverage:** 100%
-- **Line Coverage:** 83.4%
+- **Test Suites:** 3 passed, 3 total
+- **Tests:** 63 passed, 63 total
+- **Function Coverage:** 88.6%
+- **Line Coverage:** 82.4%
 
 ---
 
