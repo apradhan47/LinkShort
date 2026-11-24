@@ -182,7 +182,7 @@ npm run test:coverage
 ## 👨‍💻 Author
 
 **Aayush Pradhan**
-- LinkedIn: [linkedin.com/in/aayushpradhan02](https://www.linkedin.com/in/aayushpradhan02/)
+- LinkedIn: [linkedin.com/in/aayushpradhan01](https://www.linkedin.com/in/aayushpradhan01/)
 - Portfolio / GitHub: [github.com/apradhan47](https://github.com/apradhan47)
 - Email: aayushreq02@gmail.com
 
