@@ -38,7 +38,7 @@ LinkShort elevates basic URL shortening into an enterprise attribution suite fea
 - **Dynamic QR Codes:** Real-time QR generation and high-resolution PNG download.
 - **Scheduled Expiration:** Set link TTL (1, 7, 30, 90 days or custom calendar dates) with automatic traffic rerouting on expiration.
 - **Brute-Force & Rate Limiting:** Endpoint protection via `express-rate-limit` to defend against abusive link generation and redirection storms.
-- **83.4% Code Coverage:** **46 automated test suites** written with Jest and Supertest.
+- **82.4% Code Coverage:** **63 automated test suites** written with Jest and Supertest.
 
 ---
 
@@ -53,7 +53,7 @@ LinkShort elevates basic URL shortening into an enterprise attribution suite fea
 | **Frontend & UI** | EJS Templating, Vanilla JavaScript, CSS Glassmorphism, Boxicons, Oswald/Inter fonts |
 | **Data Visualizations** | Chart.js |
 | **Utilities** | QRCode, ShortID, Dotenv |
-| **Testing & QA** | Jest, Supertest, MongoDB Memory Server (**46 passing tests**) |
+| **Testing & QA** | Jest, Supertest, MongoDB Memory Server (**63 passing tests**) |
 | **Hosting & CI/CD** | Render (Production Auto-Deploy via GitHub) |
 
 ---
@@ -91,6 +91,10 @@ LinkShort/
 ├── models/
 │   ├── url.js             # URL schema with AI metadata & visit history
 │   └── user.js            # User schema with hashed passwords & roles
+├── public/
+│   ├── favicon.ico        # 32x32 raster favicon
+│   ├── favicon.png        # Retina PNG favicon
+│   └── favicon.svg        # Scalable dark-mode vector brand favicon
 ├── routes/
 │   ├── staticRouter.js    # Dashboard, auth gateway, and analytics views
 │   ├── url.js             # API & form endpoints for URL operations
@@ -99,8 +103,9 @@ LinkShort/
 │   ├── aiService.js       # Gemini 3.5 Flash integration & JSON parser
 │   └── auth.js            # JWT signing & token decode logic
 ├── tests/
-│   ├── rateLimiter.test.js # Security & rate-limiting test suites
-│   └── url.test.js        # End-to-end integration tests (46 total)
+│   ├── authAndFeatures.test.js # Multi-tenant auth, admin, CSV, and validation suites
+│   ├── rateLimiter.test.js     # Security & rate-limiting test suites
+│   └── url.test.js             # End-to-end integration and lifecycle tests (63 total)
 ├── views/
 │   ├── analytics.ejs      # Deep-dive individual link analytics
 │   ├── auth.ejs           # Timed carousel hero & segmented login/signup
