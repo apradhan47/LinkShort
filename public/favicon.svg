@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="linkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="50%" stop-color="#c084fc"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#bgGrad)"/>
+  <rect width="60" height="60" x="2" y="2" rx="14" fill="none" stroke="url(#linkGrad)" stroke-width="1.5" stroke-opacity="0.4"/>
+  <!-- Link chain icon -->
+  <g fill="none" stroke="url(#linkGrad)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M26 38 L21 43 C17.134 46.866 10.866 46.866 7 43 C3.134 39.134 3.134 32.866 7 29 L13 23 C16.866 19.134 23.134 19.134 27 23"/>
+    <path d="M38 26 L43 21 C46.866 17.134 53.134 17.134 57 21 C60.866 24.866 60.866 31.134 57 35 L51 41 C47.134 44.866 40.866 44.866 37 41"/>
+    <line x1="25" y1="39" x2="39" y2="25"/>
+  </g>
+</svg>
